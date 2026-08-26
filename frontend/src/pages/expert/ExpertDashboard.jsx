@@ -1,0 +1,155 @@
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { FaUserMd, FaClock, FaCheckCircle, FaEnvelope, FaRupeeSign, FaCalendarAlt, FaMapMarkerAlt, FaMicroscope } from 'react-icons/fa';
+import SmartImage from '../../components/SmartImage';
+import toast from 'react-hot-toast';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+const StatCard = ({ icon: Icon, label, value, gradient }) => (
+  <div className="card-saas p-5 relative overflow-hidden group">
+    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white mb-3 shadow-md ${gradient}`}>
+      <Icon className="text-lg" />
+    </div>
+    <p className="text-2xl font-black text-surface-900 font-display">{value}</p>
+    <p className="text-xs text-surface-500 font-bold uppercase tracking-wider mt-1">{label}</p>
+  </div>
+);
+
+const ExpertDashboard = () => {
+  const [consultations, setConsultations] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchConsultations();
+  }, []);
+
+  const fetchConsultations = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const { data } = await axios.get(`${API_URL}/consultations`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setConsultations(data.data || data || []);
+    } catch (err) {
+      console.error('Expert consultations fetch error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStatusUpdate = async (id, status) => {
+    try {
+      const token = localStorage.getItem('token');
+      let statusParam = status === 'accept' ? 'Confirmed' : status === 'reject' ? 'Rejected' : 'Completed';
+
+      await axios.put(
+        `${API_URL}/consultations/${id}/status`,
+        { status: statusParam },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success(`Consultation marked as ${statusParam}`);
+      fetchConsultations();
+    } catch (err) {
+      toast.error('Failed to update status');
+    }
+  };
+
+  const pending = consultations.filter(c => c.status === 'Pending').length;
+  const confirmed = consultations.filter(c => c.status === 'Confirmed').length;
+  const paidCount = consultations.filter(c => c.paymentStatus === 'Paid').length;
+  const revenue = consultations
+    .filter(c => c.paymentStatus === 'Paid')
+    .reduce((sum, c) => sum + (c.fee || 0), 0);
+
+  if (loading) {
+    return <div className="p-12 text-center text-xs text-surface-500 font-bold">Loading specialist dashboard...</div>;
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 page-fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold mb-2">
+            <FaUserMd className="text-brand-600" /> Specialist Advisory Console
+          </div>
+          <h1 className="page-heading">Agronomist Dashboard</h1>
+          <p className="text-xs sm:text-sm text-surface-500 font-medium mt-1">Manage farmer diagnostic requests, advisory schedules, and fee earnings.</p>
+        </div>
+        <Link to="/expert/messages" className="btn-saas-secondary text-xs flex items-center gap-2">
+          <FaEnvelope className="text-brand-700" /> Farmer Inquiries
+        </Link>
+      </div>
+
+      {/* KPI Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <StatCard icon={FaRupeeSign} label="Earned Consultation Fees" value={`₹${revenue.toLocaleString()}`} gradient="bg-gradient-to-tr from-emerald-800 to-brand-600" />
+        <StatCard icon={FaCheckCircle} label="Paid Sessions" value={paidCount} gradient="bg-gradient-to-tr from-blue-700 to-indigo-500" />
+        <StatCard icon={FaClock} label="Pending Review" value={pending} gradient="bg-gradient-to-tr from-amber-600 to-harvest-500" />
+        <StatCard icon={FaUserMd} label="Active Consultations" value={confirmed} gradient="bg-gradient-to-tr from-brand-700 to-teal-500" />
+      </div>
+
+      <div className="card-saas overflow-hidden shadow-premium">
+        <div className="px-6 py-4 border-b border-surface-100 bg-surface-50/70">
+          <h2 className="font-bold text-surface-900 text-sm font-display">Inbound Diagnostic & Consultation Requests</h2>
+        </div>
+        <div className="divide-y divide-surface-100">
+          {consultations.length === 0 ? (
+            <div className="p-14 text-center text-surface-400 text-xs font-medium">No consultation requests at the moment.</div>
+          ) : (
+            consultations.map(c => (
+              <div key={c._id} className="p-6 hover:bg-emerald-50/20 transition-colors">
+                <div className="flex flex-col md:flex-row gap-6">
+                  <div className="flex-1 space-y-2.5">
+                    <div className="flex flex-wrap items-center gap-2.5">
+                      <h3 className="font-bold text-sm text-surface-900 font-display">{c.farmerId?.name || 'Farmer Client'}</h3>
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                        c.status === 'Pending' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                        c.status === 'Confirmed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                        c.status === 'Completed' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-red-50 text-red-700 border-red-200'
+                      }`}>{c.status}</span>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                        c.paymentStatus === 'Paid' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-surface-100 text-surface-600 border-surface-200'
+                      }`}>
+                        {c.paymentStatus || 'Pending'} ({c.paymentMethod || 'Razorpay'})
+                      </span>
+                    </div>
+                    <p className="text-xs text-surface-500 flex flex-wrap items-center gap-3 font-medium">
+                      <span>📍 {c.farmerId?.location || 'Gujarat'}</span>
+                      <span>📅 {new Date(c.date).toLocaleDateString()} at {c.timeSlot}</span>
+                      <span className="font-bold text-brand-800">Fee: ₹{c.fee || 0}</span>
+                    </p>
+                    <p className="text-xs text-surface-700 leading-relaxed bg-surface-50 p-3.5 rounded-xl border border-surface-200 max-w-2xl font-medium">
+                      {c.problemDescription}
+                    </p>
+                    {c.imageUrl && (
+                      <div className="pt-1">
+                        <SmartImage src={c.imageUrl} alt="Crop" className="w-20 h-20 object-cover rounded-xl border border-surface-200 shadow-sm" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-2 md:items-end justify-center min-w-[150px]">
+                    {c.status === 'Pending' && (
+                      <>
+                        <button onClick={() => handleStatusUpdate(c._id, 'accept')} className="w-full btn-saas-primary text-xs !py-2.5">Accept Session</button>
+                        <button onClick={() => handleStatusUpdate(c._id, 'reject')} className="w-full btn-saas-secondary text-xs !py-2.5 text-red-600 border-red-200 hover:bg-red-50">Decline</button>
+                      </>
+                    )}
+                    {c.status === 'Confirmed' && (
+                      <button onClick={() => handleStatusUpdate(c._id, 'complete')} className="w-full btn-saas-secondary text-xs !py-2.5 text-emerald-700 border-emerald-200 hover:bg-emerald-50">
+                        Mark Completed
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ExpertDashboard;

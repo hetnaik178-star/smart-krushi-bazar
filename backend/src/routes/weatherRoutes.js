@@ -1,0 +1,8 @@
+const express = require('express');
+const { getFarmerWeather } = require('../controllers/weatherController');
+const { protect } = require('../middleware/authMiddleware');
+const router = express.Router();
+
+router.get('/', protect, getFarmerWeather);
+
+module.exports = router;
