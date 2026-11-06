@@ -1,0 +1,15 @@
+[
+  {
+    "_id": "6a8c5279a690997c041245d3",
+    "orderId": "6a8c5279a690997c041245cb",
+    "raisedBy": "6a8c5279a690997c041245ba",
+    "reason": "Damaged packaging during transit",
+    "description": "2 boxes arrived with fruit bruising.",
+    "imageUrl": null,
+    "status": "Resolved",
+    "adminNotes": "Full refund approved & credited via Razorpay escrow.",
+    "createdAt": "2026-08-24T14:17:29.979Z",
+    "updatedAt": "2026-08-24T14:17:30.157Z",
+    "__v": 0
+  }
+]

@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import Avatar from '../components/Avatar';
 import RoleBadge from '../components/RoleBadge';
 import BackButton from '../components/BackButton';
@@ -8,6 +9,7 @@ import { getMyProfile, getProfileStats } from '../services/profileService';
 import { FaMapMarkerAlt, FaCalendarAlt, FaEdit, FaEnvelope, FaPhone, FaLeaf, FaTractor, FaShieldAlt } from 'react-icons/fa';
 
 const MyProfile = () => {
+  const { t } = useLanguage();
   const { user } = useContext(AuthContext);
   const [profile, setProfile] = useState(null);
   const [stats, setStats] = useState(null);
@@ -64,7 +66,7 @@ const MyProfile = () => {
   return (
     <div className="page-fade-in max-w-4xl mx-auto px-4 py-8">
       <div className="mb-6">
-        <BackButton fallback={getDashboardFallback()} label="Back to Dashboard" />
+        <BackButton fallback={getDashboardFallback()} label={t('nav.dashboard', 'Back to Dashboard')} />
       </div>
 
       {/* Profile Header Card */}
@@ -90,12 +92,12 @@ const MyProfile = () => {
                   <FaMapMarkerAlt className="text-emerald-600" /> {profile.location || 'Gujarat'}
                 </span>
                 <span className="flex items-center gap-1">
-                  <FaCalendarAlt className="text-brand-600" /> Joined {joinedDate}
+                  <FaCalendarAlt className="text-brand-600" /> {t('common.date', 'Joined')} {joinedDate}
                 </span>
               </div>
             </div>
             <Link to="/profile/edit" className="btn-saas-secondary text-xs !py-2.5 self-start md:self-auto shadow-sm">
-              <FaEdit className="mr-1.5 text-brand-700" /> Edit Profile
+              <FaEdit className="mr-1.5 text-brand-700" /> {t('nav.editProfile', 'Edit Profile')}
             </Link>
           </div>
 
@@ -112,17 +114,17 @@ const MyProfile = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
           {profile.role === 'Farmer' ? (
             <>
-              <StatCard label="Active Crops" value={stats.activeProducts} color="green" />
-              <StatCard label="Total Orders" value={stats.totalOrders} color="blue" />
-              <StatCard label="Pending Orders" value={stats.pendingOrders} color="amber" />
-              <StatCard label="Dispatches" value={stats.completedOrders} color="emerald" />
+              <StatCard label={t('farmer.activeListings', 'Active Crops')} value={stats.activeProducts} color="green" />
+              <StatCard label={t('orders.title', 'Total Orders')} value={stats.totalOrders} color="blue" />
+              <StatCard label={t('farmer.pendingDispatches', 'Pending Orders')} value={stats.pendingOrders} color="amber" />
+              <StatCard label={t('orders.delivered', 'Dispatches')} value={stats.completedOrders} color="emerald" />
             </>
           ) : (
             <>
-              <StatCard label="Total Orders" value={stats.totalOrders} color="blue" />
-              <StatCard label="In Transit" value={stats.pendingOrders} color="amber" />
-              <StatCard label="Delivered" value={stats.completedOrders} color="emerald" />
-              <StatCard label="Saved Items" value={stats.wishlistCount} color="rose" />
+              <StatCard label={t('orders.title', 'Total Orders')} value={stats.totalOrders} color="blue" />
+              <StatCard label={t('orders.inTransit', 'In Transit')} value={stats.pendingOrders} color="amber" />
+              <StatCard label={t('orders.delivered', 'Delivered')} value={stats.completedOrders} color="emerald" />
+              <StatCard label={t('nav.wishlist', 'Saved Items')} value={stats.wishlistCount} color="rose" />
             </>
           )}
         </div>
@@ -130,21 +132,21 @@ const MyProfile = () => {
 
       {/* Account Details */}
       <div className="card-saas p-6 sm:p-7 mt-6 shadow-premium">
-        <h2 className="text-sm font-bold text-surface-900 uppercase tracking-wider mb-5 font-display">Account Information</h2>
+        <h2 className="text-sm font-bold text-surface-900 uppercase tracking-wider mb-5 font-display">{t('profile.accountInfo', 'Account Information')}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <DetailItem icon={FaEnvelope} label="Email Address" value={profile.email} />
-          <DetailItem icon={FaPhone} label="Phone Number" value={profile.phone || 'Not provided'} />
-          <DetailItem icon={FaMapMarkerAlt} label="Location / District" value={profile.location || 'Gujarat'} />
-          <DetailItem icon={FaCalendarAlt} label="Registration Date" value={joinedDate} />
+          <DetailItem icon={FaEnvelope} label={t('auth.emailLabel', 'Email Address')} value={profile.email} />
+          <DetailItem icon={FaPhone} label={t('auth.phoneLabel', 'Phone Number')} value={profile.phone || 'Not provided'} />
+          <DetailItem icon={FaMapMarkerAlt} label={t('auth.locationLabel', 'Location / District')} value={profile.location || 'Gujarat'} />
+          <DetailItem icon={FaCalendarAlt} label={t('common.date', 'Registration Date')} value={joinedDate} />
         </div>
 
         {/* Farmer-specific Information */}
         {profile.role === 'Farmer' && (
           <div className="mt-6 pt-6 border-t border-surface-100">
-            <h3 className="text-sm font-bold text-surface-900 uppercase tracking-wider mb-4 font-display">Farm Specifications</h3>
+            <h3 className="text-sm font-bold text-surface-900 uppercase tracking-wider mb-4 font-display">{t('profile.farmSpecs', 'Farm Specifications')}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <DetailItem icon={FaTractor} label="Farm / Organic Enterprise" value={profile.farmName || 'Direct Family Farm'} />
-              <DetailItem icon={FaLeaf} label="Crop Specialization" value={profile.specialization || 'Vegetables & Grains'} />
+              <DetailItem icon={FaTractor} label={t('auth.farmNameLabel', 'Farm / Organic Enterprise')} value={profile.farmName || 'Direct Family Farm'} />
+              <DetailItem icon={FaLeaf} label={t('auth.specializationLabel', 'Crop Specialization')} value={profile.specialization || 'Vegetables & Grains'} />
             </div>
           </div>
         )}

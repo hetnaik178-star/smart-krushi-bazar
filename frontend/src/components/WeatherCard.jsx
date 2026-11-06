@@ -20,7 +20,7 @@ const WeatherCard = () => {
     return <div className="card-saas p-6 h-48 skeleton-shimmer"></div>;
   }
 
-  if (!weather) {
+  if (!weather || typeof weather !== 'object' || !weather.current) {
     return (
       <div className="card-saas p-4 text-surface-500 text-xs font-medium">
         Weather advisory feed temporarily offline.

@@ -1,10 +1,39 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// Dynamically resolve API URL so that when accessed from desktop or mobile phone,
+// all backend requests route cleanly via Vite proxy (/api) or configured environment
+export function getApiBaseUrl() {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl && envUrl.trim() !== '') return envUrl;
+  return '/api';
+}
 
-// Automatically attach JWT token to all requests if present in localStorage
-axios.interceptors.request.use(
+export const API_URL = getApiBaseUrl();
+
+const api = axios.create({
+  baseURL: API_URL
+});
+
+// Helper to rewrite localhost:5000 URLs to /api or current hostname on mobile devices
+const rewriteUrlForHost = (url) => {
+  if (!url || typeof window === 'undefined') return url;
+  if (url.includes('localhost:5000/api') || url.includes('127.0.0.1:5000/api')) {
+    return url.replace(/https?:\/\/(localhost|127\.0\.0\.1):5000\/api/, '/api');
+  }
+  if (url.includes('localhost:5000/uploads') || url.includes('127.0.0.1:5000/uploads')) {
+    return url.replace(/https?:\/\/(localhost|127\.0\.0\.1):5000\/uploads/, '/uploads');
+  }
+  const hostname = window.location.hostname;
+  if (hostname && hostname !== 'localhost' && hostname !== '127.0.0.1') {
+    return url.replace('//localhost:5000', `//${hostname}:5000`).replace('//127.0.0.1:5000', `//${hostname}:5000`);
+  }
+  return url;
+};
+
+api.interceptors.request.use(
   (config) => {
+    if (config.baseURL) config.baseURL = rewriteUrlForHost(config.baseURL);
+    if (config.url) config.url = rewriteUrlForHost(config.url);
     const token = localStorage.getItem('token');
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
@@ -13,6 +42,40 @@ axios.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
+
+// Automatically attach JWT token to all global axios requests and rewrite host for mobile network
+axios.interceptors.request.use(
+  (config) => {
+    if (config.baseURL) config.baseURL = rewriteUrlForHost(config.baseURL);
+    if (config.url) config.url = rewriteUrlForHost(config.url);
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Intercept window.fetch so fetch() calls with localhost:5000 also work cleanly
+if (typeof window !== 'undefined' && window.fetch) {
+  const originalFetch = window.fetch;
+  window.fetch = function (resource, init) {
+    if (typeof resource === 'string') {
+      if (resource.includes('localhost:5000/api') || resource.includes('127.0.0.1:5000/api')) {
+        resource = resource.replace(/https?:\/\/(localhost|127\.0\.0\.1):5000\/api/, '/api');
+      } else if (resource.includes('localhost:5000/uploads') || resource.includes('127.0.0.1:5000/uploads')) {
+        resource = resource.replace(/https?:\/\/(localhost|127\.0\.0\.1):5000\/uploads/, '/uploads');
+      } else if (resource.includes('localhost:5000')) {
+        const hostname = window.location.hostname;
+        if (hostname && hostname !== 'localhost' && hostname !== '127.0.0.1') {
+          resource = resource.replace('localhost:5000', `${hostname}:5000`);
+        }
+      }
+    }
+    return originalFetch.apply(this, [resource, init]);
+  };
+}
 
 export const registerUser = async (userData) => {
   const { data } = await axios.post(`${API_URL}/auth/register`, userData);
@@ -113,3 +176,6 @@ export const deleteAdminProduct = async (id) => {
   const { data } = await axios.delete(`${API_URL}/admin/products/${id}`);
   return data;
 };
+
+export { api };
+export default api;

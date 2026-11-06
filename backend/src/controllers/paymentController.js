@@ -6,6 +6,7 @@ const Product = require('../models/Product');
 const Cart = require('../models/Cart');
 const Consultation = require('../models/Consultation');
 const User = require('../models/User');
+const { calculateOrderFreight } = require('../utils/freightCalculator');
 
 const hasValidKeys = () => {
   const keyId = process.env.RAZORPAY_KEY_ID || '';
@@ -48,6 +49,10 @@ const createOrder = async (req, res) => {
           if (!product || product.quantity < item.quantity) {
             return res.status(400).json({ success: false, message: `Insufficient stock for ${product?.name || 'product'}` });
           }
+          const produceAmount = product.price * item.quantity;
+          const freight = calculateOrderFreight(item.quantity, product.location, req.user?.location, product.category);
+          const totalPrice = produceAmount + freight.freightAmount;
+
           const order = await Order.create({
             productId: product._id,
             productName: product.name,
@@ -55,7 +60,12 @@ const createOrder = async (req, res) => {
             farmerId: product.farmerId,
             quantity: item.quantity,
             unitPrice: product.price,
-            totalPrice: product.price * item.quantity,
+            produceAmount,
+            freightAmount: freight.freightAmount,
+            vehicleType: freight.vehicleName,
+            isBulkOrder: freight.isBulk,
+            deliveryDistanceKm: freight.distanceKm,
+            totalPrice,
             status: 'Pending',
             paymentMethod: 'COD',
             paymentProvider: null,
@@ -132,7 +142,9 @@ const createOrder = async (req, res) => {
         if (!product || product.quantity < item.quantity) {
           return res.status(400).json({ success: false, message: `Insufficient stock: ${product?.name}` });
         }
-        amount += product.price * item.quantity;
+        const produceAmount = product.price * item.quantity;
+        const freight = calculateOrderFreight(item.quantity, product.location, req.user?.location, product.category);
+        amount += produceAmount + freight.freightAmount;
       }
     } else if (type === 'product') {
       if (!orderIds.length) return res.status(400).json({ success: false, message: 'Missing order ID' });

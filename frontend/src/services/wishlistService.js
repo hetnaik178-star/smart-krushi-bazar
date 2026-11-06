@@ -1,10 +1,13 @@
 import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from './api';
 
 export const getWishlist = async () => {
-  const { data } = await axios.get(`${API_URL}/wishlist`);
-  return data;
+  try {
+    const { data } = await axios.get(`${API_URL}/wishlist`);
+    return Array.isArray(data) ? data : (data?.data || []);
+  } catch (e) {
+    return [];
+  }
 };
 
 export const addToWishlist = async (productId) => {

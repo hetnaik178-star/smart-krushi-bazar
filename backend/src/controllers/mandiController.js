@@ -1,4 +1,4 @@
-const { fetchMandiData, getAvailableLocations } = require('../services/mandiDataService');
+const { fetchMandiData, getAvailableLocations, getMandiPriceTrend } = require('../services/mandiDataService');
 
 // @desc    Get real daily APMC Mandi commodity market prices
 // @route   GET /api/mandi
@@ -43,7 +43,29 @@ const getMandiLocations = async (req, res) => {
   }
 };
 
+// @desc    Get 7-day or 30-day commodity price trend history
+// @route   GET /api/mandi/trend
+// @access  Public
+const getMandiTrend = async (req, res) => {
+  try {
+    const { commodity = 'Wheat', days = 7, market } = req.query;
+    const trend = await getMandiPriceTrend(commodity, days, market);
+    res.json({
+      success: true,
+      data: trend
+    });
+  } catch (error) {
+    console.error('Error fetching Mandi price trend:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch Mandi price trend',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   getMandiPrices,
-  getMandiLocations
+  getMandiLocations,
+  getMandiTrend
 };

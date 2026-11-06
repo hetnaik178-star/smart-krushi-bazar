@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios';
+import { API_URL } from '../../services/api';
 import { createRazorpayOrder, verifyPayment, reportPaymentFailure } from '../../services/paymentService';
 import { loadRazorpayScript } from '../../utils/razorpay';
 import SmartImage from '../../components/SmartImage';
@@ -19,8 +20,6 @@ import {
   FaTimes
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const ConsultationBooking = () => {
   const { expertId } = useParams();
@@ -213,23 +212,44 @@ const ConsultationBooking = () => {
     return <div className="p-12 text-center text-xs text-surface-500 font-semibold">Loading specialist profile...</div>;
   }
 
+  // Helper for Stepper Component
+  const renderStepper = () => (
+    <div className="mb-10 max-w-sm mx-auto">
+      <div className="flex items-center justify-center">
+        <div className={`step-indicator ${step === 'form' ? 'active' : 'completed'}`}>1</div>
+        <div className={`step-connector ${step === 'payment' || step === 'success' ? 'completed' : ''}`}></div>
+        <div className={`step-indicator ${step === 'payment' ? 'active' : step === 'success' ? 'completed' : 'pending'}`}>2</div>
+        <div className={`step-connector ${step === 'success' ? 'completed' : ''}`}></div>
+        <div className={`step-indicator ${step === 'success' ? 'completed' : 'pending'}`}>3</div>
+      </div>
+      <div className="flex justify-between px-2 mt-2 text-[10px] font-bold uppercase tracking-wider text-surface-400">
+        <span className={step === 'form' ? 'text-brand-700' : step === 'payment' || step === 'success' ? 'text-surface-800' : ''}>Schedule</span>
+        <span className={step === 'payment' ? 'text-brand-700' : step === 'success' ? 'text-surface-800' : ''}>Payment</span>
+        <span className={step === 'success' ? 'text-brand-700' : ''}>Confirmed</span>
+      </div>
+    </div>
+  );
+
   // ============ SUCCESS SCREEN ============
   if (step === 'success') {
     return (
-      <div className="max-w-md mx-auto px-4 py-24 text-center page-fade-in">
-        <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <FaCheckCircle className="text-4xl text-emerald-600" />
-        </div>
-        <h1 className="text-3xl font-bold text-surface-900 font-display mb-3">Consultation Confirmed!</h1>
-        <p className="text-surface-500 mb-2 text-sm">
-          Your diagnostic advisory session with <strong>{expert.name}</strong> has been registered.
-        </p>
-        <p className="text-xs text-surface-500 mb-8 font-medium">
-          📅 {new Date(formData.date).toLocaleDateString()} at {formData.timeSlot}
-        </p>
-        <div className="flex gap-3 justify-center">
-          <Link to="/farmer/consultations" className="btn-saas-secondary text-xs">View My Consultations</Link>
-          <Link to={`/chat?receiverId=${expert._id}`} className="btn-saas-primary text-xs">Message Expert</Link>
+      <div className="max-w-md mx-auto px-4 py-16 text-center page-fade-in">
+        {renderStepper()}
+        <div className="animate-celebrate">
+          <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-success-circle">
+            <FaCheckCircle className="text-4xl text-emerald-600" />
+          </div>
+          <h1 className="text-3xl font-bold text-surface-900 font-display mb-3">Consultation Confirmed!</h1>
+          <p className="text-surface-500 mb-2 text-sm">
+            Your diagnostic advisory session with <strong>{expert.name}</strong> has been registered.
+          </p>
+          <p className="text-xs text-surface-500 mb-8 font-medium">
+            📅 {new Date(formData.date).toLocaleDateString()} at {formData.timeSlot}
+          </p>
+          <div className="flex gap-3 justify-center">
+            <Link to="/farmer/consultations" className="btn-saas-secondary text-xs hover-glow">View My Consultations</Link>
+            <Link to={`/chat?receiverId=${expert._id}`} className="btn-saas-primary text-xs hover-glow">Message Expert</Link>
+          </div>
         </div>
       </div>
     );
@@ -240,15 +260,17 @@ const ConsultationBooking = () => {
     return (
       <div className="max-w-xl mx-auto px-4 py-10 page-fade-in">
         <div className="mb-6">
-          <button onClick={() => setStep('form')} className="btn-saas-secondary text-xs">
+          <button onClick={() => setStep('form')} className="btn-saas-secondary text-xs hover-glow">
             ← Back to Appointment Details
           </button>
         </div>
 
-        <h1 className="text-2xl font-bold text-surface-900 font-display mb-2">Confirm & Pay Session Fee</h1>
-        <p className="text-xs text-surface-500 mb-8">Secure your slot with expert agronomy specialist</p>
+        {renderStepper()}
 
-        <div className="card-saas p-6 space-y-6">
+        <h1 className="text-2xl font-bold text-surface-900 font-display mb-2 text-center">Confirm & Pay Session Fee</h1>
+        <p className="text-xs text-surface-500 mb-8 text-center">Secure your slot with expert agronomy specialist</p>
+
+        <div className="card-saas p-6 space-y-6 animate-scale-in">
           <div className="flex items-center gap-4 pb-6 border-b border-surface-100">
             <SmartImage src={expert.profileImage} alt={expert.name} className="w-16 h-16 rounded-2xl object-cover border border-surface-200" />
             <div>
@@ -282,7 +304,7 @@ const ConsultationBooking = () => {
           <button
             onClick={handlePayNow}
             disabled={processing}
-            className="w-full btn-saas-primary !py-3.5 flex items-center justify-center gap-2 disabled:opacity-60 text-sm font-bold"
+            className="w-full btn-saas-primary !py-3.5 flex items-center justify-center gap-2 disabled:opacity-60 text-sm font-bold hover-glow"
           >
             {processing ? <><FaSpinner className="animate-spin" /> Processing Payment…</>
                        : <><FaLock /> Pay ₹{fee} & Confirm Session</>}
@@ -365,12 +387,14 @@ const ConsultationBooking = () => {
         <BackButton fallback="/experts" label="Back to Specialists" />
       </div>
 
-      <h1 className="text-2xl font-bold text-surface-900 font-display mb-1">Book Consultation Session</h1>
-      <p className="text-xs text-surface-500 mb-8">
+      {renderStepper()}
+
+      <h1 className="text-2xl font-bold text-surface-900 font-display mb-1 text-center">Book Consultation Session</h1>
+      <p className="text-xs text-surface-500 mb-8 text-center">
         Specialist: <strong>{expert.name}</strong> • Fee: <span className="font-bold text-brand-800">{fee === 0 ? 'FREE' : `₹${fee}`}</span>
       </p>
 
-      <form onSubmit={handleSubmitForm} className="card-saas p-6 space-y-5">
+      <form onSubmit={handleSubmitForm} className="card-saas p-6 space-y-5 animate-scale-in">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-bold text-surface-700 mb-1 uppercase tracking-wider">Date *</label>
@@ -385,20 +409,25 @@ const ConsultationBooking = () => {
           </div>
           <div>
             <label className="block text-xs font-bold text-surface-700 mb-1 uppercase tracking-wider">Time Slot *</label>
-            <select
-              value={formData.timeSlot}
-              onChange={e => setFormData({ ...formData, timeSlot: e.target.value })}
-              className="input-saas text-xs"
-              required
-            >
-              <option value="">Select slot</option>
+            <div className="flex flex-col gap-2 max-h-40 overflow-y-auto scrollbar-saas pr-2">
               {(expert.availableSlots?.length > 0
                 ? expert.availableSlots
                 : ['10:00 AM - 11:00 AM', '11:30 AM - 12:30 PM', '02:00 PM - 03:00 PM', '04:00 PM - 05:00 PM']
               ).map(s => (
-                <option key={s} value={s}>{s}</option>
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, timeSlot: s })}
+                  className={`text-left px-3 py-2 text-xs font-bold rounded-xl transition-all border ${
+                    formData.timeSlot === s 
+                    ? 'bg-brand-50 border-brand-500 text-brand-900 animate-glow' 
+                    : 'bg-white border-surface-200 text-surface-700 hover:border-brand-300'
+                  }`}
+                >
+                  {s}
+                </button>
               ))}
-            </select>
+            </div>
           </div>
         </div>
 
@@ -428,7 +457,7 @@ const ConsultationBooking = () => {
         <button
           type="submit"
           disabled={processing || !expert}
-          className="w-full btn-saas-primary !py-3 text-xs font-bold disabled:opacity-60"
+          className="w-full btn-saas-primary !py-3 text-xs font-bold disabled:opacity-60 hover-glow"
         >
           {processing
             ? 'Saving appointment…'

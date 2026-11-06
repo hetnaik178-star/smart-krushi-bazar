@@ -5,9 +5,11 @@ import RoleBadge from '../components/RoleBadge';
 import ProductCard from '../components/ProductCard';
 import BackButton from '../components/BackButton';
 import { getPublicFarmerProfile } from '../services/profileService';
+import { useLanguage } from '../context/LanguageContext';
 import { FaMapMarkerAlt, FaCalendarAlt, FaBoxOpen, FaLeaf, FaTractor, FaShieldAlt } from 'react-icons/fa';
 
 const FarmerPublicProfile = () => {
+  const { t } = useLanguage();
   const { id } = useParams();
   const [farmer, setFarmer] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -54,7 +56,7 @@ const FarmerPublicProfile = () => {
   return (
     <div className="page-fade-in max-w-6xl mx-auto px-4 py-8">
       <div className="mb-6">
-        <BackButton fallback="/products" label="Back to Marketplace" />
+        <BackButton fallback="/products" label={t('common.backToMarket', 'Back to Marketplace')} />
       </div>
 
       {/* Profile Header */}
@@ -78,7 +80,7 @@ const FarmerPublicProfile = () => {
                   <FaMapMarkerAlt className="text-emerald-600" /> {farmer.location || 'Gujarat Farm'}
                 </span>
                 <span className="flex items-center gap-1">
-                  <FaCalendarAlt className="text-brand-600" /> Member since {joinedDate}
+                  <FaCalendarAlt className="text-brand-600" /> {t('profile.joinedOn', { date: joinedDate }, `Member since ${joinedDate}`)}
                 </span>
               </div>
             </div>
@@ -100,7 +102,7 @@ const FarmerPublicProfile = () => {
           </div>
           <div>
             <p className="text-2xl font-black text-surface-900 font-display">{farmer.activeProducts}</p>
-            <p className="text-[10px] text-surface-500 font-bold uppercase tracking-wider">Active Harvests</p>
+            <p className="text-[10px] text-surface-500 font-bold uppercase tracking-wider">{t('farmer.activeListings', 'Active Harvests')}</p>
           </div>
         </div>
 
@@ -110,7 +112,7 @@ const FarmerPublicProfile = () => {
           </div>
           <div>
             <p className="text-2xl font-black text-surface-900 font-display">{farmer.products?.length || 0}</p>
-            <p className="text-[10px] text-surface-500 font-bold uppercase tracking-wider">Total Listings</p>
+            <p className="text-[10px] text-surface-500 font-bold uppercase tracking-wider">{t('farmer.manageListings', 'Total Listings')}</p>
           </div>
         </div>
 
@@ -120,7 +122,7 @@ const FarmerPublicProfile = () => {
           </div>
           <div>
             <p className="text-base font-black text-surface-900 font-display">{joinedDate}</p>
-            <p className="text-[10px] text-surface-500 font-bold uppercase tracking-wider">Verified Since</p>
+            <p className="text-[10px] text-surface-500 font-bold uppercase tracking-wider">{t('common.verified', 'Verified Since')}</p>
           </div>
         </div>
       </div>
@@ -128,17 +130,17 @@ const FarmerPublicProfile = () => {
       {/* Farm Details */}
       {(farmer.farmName || farmer.specialization) && (
         <div className="card-saas p-6 sm:p-7 mt-6 shadow-premium">
-          <h2 className="text-xs font-bold text-surface-500 uppercase tracking-wider mb-4 font-display">About Farm Operations</h2>
+          <h2 className="text-xs font-bold text-surface-500 uppercase tracking-wider mb-4 font-display">{t('profile.title', 'About Farm Operations')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {farmer.farmName && (
               <div className="p-3.5 bg-surface-50 rounded-xl border border-surface-200">
-                <p className="text-[10px] text-surface-400 font-bold uppercase tracking-wide">Farm Title</p>
+                <p className="text-[10px] text-surface-400 font-bold uppercase tracking-wide">{t('profile.farmName', 'Farm Title')}</p>
                 <p className="text-xs font-bold text-surface-800 mt-0.5">{farmer.farmName}</p>
               </div>
             )}
             {farmer.specialization && (
               <div className="p-3.5 bg-surface-50 rounded-xl border border-surface-200">
-                <p className="text-[10px] text-surface-400 font-bold uppercase tracking-wide">Specialization</p>
+                <p className="text-[10px] text-surface-400 font-bold uppercase tracking-wide">{t('expert.specialization', 'Specialization')}</p>
                 <p className="text-xs font-bold text-surface-800 mt-0.5">{farmer.specialization}</p>
               </div>
             )}
@@ -161,7 +163,7 @@ const FarmerPublicProfile = () => {
         ) : (
           <div className="card-saas p-12 text-center">
             <FaBoxOpen className="text-4xl text-emerald-200 mx-auto mb-4" />
-            <p className="text-xs text-surface-500 font-medium">No active products listed yet by this farmer.</p>
+            <p className="text-xs text-surface-500 font-medium">{t('farmer.noListingsDesc', 'No active products listed yet by this farmer.')}</p>
           </div>
         )}
       </div>

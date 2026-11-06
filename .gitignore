@@ -21,3 +21,12 @@ yarn-error.log*
 # OS Files
 .DS_Store
 Thumbs.db
+*.timestamp-*
+vite.config.js.timestamp*
+
+# Temporary files & browser data
+temp_chrome/
+~$*
+*.tmp
+test_doc.docx
+

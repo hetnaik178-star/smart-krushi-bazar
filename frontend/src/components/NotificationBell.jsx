@@ -4,10 +4,11 @@ import { SocketContext } from '../context/SocketContext';
 import { AuthContext } from '../context/AuthContext';
 import { FaBell, FaCheck, FaEnvelope, FaShoppingBag, FaCalendarCheck } from 'react-icons/fa';
 import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { API_URL } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 
 const NotificationBell = () => {
+  const { t } = useLanguage();
   const { user } = useContext(AuthContext);
   const { socket } = useContext(SocketContext) || {};
   const [notifications, setNotifications] = useState([]);
@@ -116,19 +117,19 @@ const NotificationBell = () => {
       {open && (
         <div className="absolute right-0 mt-2 w-80 sm:w-96 glass-card shadow-2xl border border-surface-200 overflow-hidden z-50 animate-scale-up">
           <div className="px-4 py-3 border-b border-surface-100 flex justify-between items-center bg-surface-50/80">
-            <h3 className="font-bold text-surface-900 text-xs font-display">Notifications</h3>
+            <h3 className="font-bold text-surface-900 text-xs font-display">{t('common.notifications', 'Notifications')}</h3>
             {unreadCount > 0 && (
               <button
                 onClick={markAllRead}
                 className="text-[11px] text-brand-700 font-bold hover:underline flex items-center gap-1"
               >
-                <FaCheck className="text-[10px]" /> Mark all read
+                <FaCheck className="text-[10px]" /> {t('common.markAllRead', 'Mark all read')}
               </button>
             )}
           </div>
           <div className="max-h-80 overflow-y-auto scrollbar-saas">
             {notifications.length === 0 ? (
-              <div className="p-8 text-center text-surface-400 text-xs font-medium">No new notifications</div>
+              <div className="p-8 text-center text-surface-400 text-xs font-medium">{t('common.noNotifications', 'No new notifications')}</div>
             ) : (
               notifications.map(n => {
                 const Icon = iconFor(n.type);

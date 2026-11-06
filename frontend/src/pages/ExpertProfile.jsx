@@ -265,11 +265,11 @@ const ExpertProfile = () => {
 
   if (error || !expert) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-16 text-center">
+      <div className="max-w-5xl mx-auto px-4 py-16 text-center animate-fade-in">
         <FaUserMd className="text-5xl text-surface-300 mx-auto mb-4" />
         <h2 className="text-xl font-bold text-surface-900 mb-2">Expert Not Found</h2>
         <p className="text-xs text-surface-500 mb-6">{error || 'The requested specialist profile is unavailable.'}</p>
-        <Link to="/experts" className="btn-saas-primary text-xs">Browse All Specialists</Link>
+        <Link to="/experts" className="btn-saas-primary text-xs hover-glow">Browse All Specialists</Link>
       </div>
     );
   }
@@ -278,6 +278,24 @@ const ExpertProfile = () => {
     ? expert.availableSlots
     : ['10:00 AM - 11:00 AM', '11:30 AM - 12:30 PM', '02:00 PM - 03:00 PM', '04:00 PM - 05:00 PM'];
 
+  // Helper for Stepper Component
+  const renderStepper = () => (
+    <div className="mb-10 max-w-sm mx-auto animate-fade-in">
+      <div className="flex items-center justify-center">
+        <div className={`step-indicator ${step === 'form' ? 'active' : 'completed'}`}>1</div>
+        <div className={`step-connector ${step === 'payment' || step === 'success' ? 'completed' : ''}`}></div>
+        <div className={`step-indicator ${step === 'payment' ? 'active' : step === 'success' ? 'completed' : 'pending'}`}>2</div>
+        <div className={`step-connector ${step === 'success' ? 'completed' : ''}`}></div>
+        <div className={`step-indicator ${step === 'success' ? 'completed' : 'pending'}`}>3</div>
+      </div>
+      <div className="flex justify-between px-2 mt-2 text-[10px] font-bold uppercase tracking-wider text-surface-400">
+        <span className={step === 'form' ? 'text-brand-700' : step === 'payment' || step === 'success' ? 'text-surface-800' : ''}>Schedule</span>
+        <span className={step === 'payment' ? 'text-brand-700' : step === 'success' ? 'text-surface-800' : ''}>Payment</span>
+        <span className={step === 'success' ? 'text-brand-700' : ''}>Confirmed</span>
+      </div>
+    </div>
+  );
+
   return (
     <div className="page-fade-in max-w-5xl mx-auto px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
@@ -285,7 +303,7 @@ const ExpertProfile = () => {
         {user && user.role !== 'Expert' && (
           <Link
             to={`/chat?receiverId=${expert._id}`}
-            className="btn-saas-secondary text-xs flex items-center gap-1.5"
+            className="btn-saas-secondary text-xs flex items-center gap-1.5 hover-glow"
           >
             <FaComments className="text-xs text-brand-700" /> Message Specialist
           </Link>
@@ -295,8 +313,8 @@ const ExpertProfile = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column: Expert Profile Details */}
         <div className="lg:col-span-1 space-y-6">
-          <div className="card-saas p-6 text-center">
-            <div className="mx-auto w-24 h-24 mb-4 relative">
+          <div className="card-saas p-6 text-center animate-slide-up">
+            <div className="mx-auto w-24 h-24 mb-4 relative animate-scale-in">
               <Avatar src={expert.profileImage} name={expert.name} size="xl" />
               <div className="absolute bottom-0 right-0 bg-brand-600 text-white p-1.5 rounded-full ring-2 ring-white">
                 <FaShieldAlt size={12} />
@@ -309,7 +327,7 @@ const ExpertProfile = () => {
               <RoleBadge role="Expert" size="sm" />
             </div>
 
-            <div className="border-t border-surface-100 pt-4 text-left space-y-3">
+            <div className="border-t border-surface-100 pt-4 text-left space-y-3 stagger-1">
               {expert.qualification && (
                 <div className="flex items-start gap-2.5 text-xs text-surface-600">
                   <FaGraduationCap className="text-brand-600 mt-0.5 shrink-0 text-sm" />
@@ -342,7 +360,7 @@ const ExpertProfile = () => {
             </div>
 
             {expert.bio && (
-              <div className="mt-4 pt-4 border-t border-surface-100 text-left">
+              <div className="mt-4 pt-4 border-t border-surface-100 text-left stagger-2">
                 <span className="text-[11px] font-bold text-surface-500 uppercase tracking-wider block mb-1">
                   About Specialist
                 </span>
@@ -356,16 +374,19 @@ const ExpertProfile = () => {
         <div className="lg:col-span-2">
           {/* STEP 3: SUCCESS CONFIRMATION */}
           {step === 'success' && (
-            <div className="card-saas p-8 text-center space-y-4">
-              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto text-emerald-600 text-3xl">
-                <FaCheckCircle />
+            <div className="card-saas p-8 text-center space-y-4 animate-scale-in">
+              {renderStepper()}
+              <div className="animate-celebrate mt-8">
+                <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto text-emerald-600 text-3xl animate-success-circle mb-4">
+                  <FaCheckCircle />
+                </div>
+                <h2 className="text-2xl font-bold text-surface-900 font-display">Consultation Confirmed!</h2>
+                <p className="text-xs text-surface-600 max-w-md mx-auto">
+                  Your consultation appointment with <strong>{expert.name}</strong> has been confirmed.
+                </p>
               </div>
-              <h2 className="text-2xl font-bold text-surface-900 font-display">Consultation Confirmed!</h2>
-              <p className="text-xs text-surface-600 max-w-md mx-auto">
-                Your consultation appointment with <strong>{expert.name}</strong> has been confirmed.
-              </p>
 
-              <div className="bg-surface-50 p-4 rounded-xl border border-surface-200 text-left text-xs max-w-md mx-auto space-y-2">
+              <div className="bg-surface-50 p-4 rounded-xl border border-surface-200 text-left text-xs max-w-md mx-auto space-y-2 animate-slide-up stagger-1">
                 <div className="flex justify-between">
                   <span className="text-surface-500">Date:</span>
                   <span className="font-bold text-surface-900">{new Date(date).toLocaleDateString()}</span>
@@ -380,11 +401,11 @@ const ExpertProfile = () => {
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-3 justify-center pt-4">
-                <Link to="/farmer/consultations" className="btn-saas-secondary text-xs">
+              <div className="flex flex-wrap gap-3 justify-center pt-4 animate-slide-up stagger-2">
+                <Link to="/farmer/consultations" className="btn-saas-secondary text-xs hover-glow">
                   Go to My Consultations
                 </Link>
-                <Link to={`/chat?receiverId=${expert._id}`} className="btn-saas-primary text-xs">
+                <Link to={`/chat?receiverId=${expert._id}`} className="btn-saas-primary text-xs hover-glow">
                   Message Expert
                 </Link>
               </div>
@@ -393,21 +414,23 @@ const ExpertProfile = () => {
 
           {/* STEP 2: SUMMARY & PAY NOW SCREEN */}
           {step === 'summary' && (
-            <div className="card-saas p-6 sm:p-8 space-y-6">
-              <div className="flex items-center justify-between pb-4 border-b border-surface-100">
+            <div className="card-saas p-6 sm:p-8 space-y-6 animate-slide-left">
+              {renderStepper()}
+
+              <div className="flex items-center justify-between pb-4 border-b border-surface-100 animate-fade-in-up">
                 <div>
                   <h2 className="text-lg font-bold text-surface-900 font-display">Step 2: Consultation Summary & Payment</h2>
                   <p className="text-xs text-surface-500">Review appointment details before proceeding to payment.</p>
                 </div>
                 <button
                   onClick={() => setStep('form')}
-                  className="text-xs font-semibold text-brand-700 hover:underline"
+                  className="text-xs font-semibold text-brand-700 hover:underline hover-glow"
                 >
                   ← Edit Details
                 </button>
               </div>
 
-              <div className="space-y-4 text-xs">
+              <div className="space-y-4 text-xs animate-slide-up stagger-1">
                 <div className="grid grid-cols-2 gap-4 bg-surface-50 p-4 rounded-xl border border-surface-200">
                   <div>
                     <span className="text-surface-500 block mb-0.5">Specialist</span>
@@ -431,12 +454,12 @@ const ExpertProfile = () => {
                   </div>
                 </div>
 
-                <div className="bg-surface-50 p-4 rounded-xl border border-surface-200">
+                <div className="bg-surface-50 p-4 rounded-xl border border-surface-200 animate-slide-up stagger-2">
                   <span className="text-surface-500 block mb-1">Problem Description</span>
                   <p className="text-surface-800 italic leading-relaxed">{problemDescription}</p>
                 </div>
 
-                <div className="bg-brand-50/60 p-4 rounded-xl border border-brand-200 flex justify-between items-center">
+                <div className="bg-brand-50/60 p-4 rounded-xl border border-brand-200 flex justify-between items-center animate-scale-in stagger-3">
                   <div>
                     <span className="text-xs font-semibold text-brand-900 block">Total Session Fee</span>
                     <span className="text-[11px] text-surface-500">100% verified advisory session</span>
@@ -448,7 +471,7 @@ const ExpertProfile = () => {
               <button
                 onClick={handlePayNow}
                 disabled={booking}
-                className="w-full btn-saas-primary !py-3.5 flex items-center justify-center gap-2 text-sm font-bold disabled:opacity-60"
+                className="w-full btn-saas-primary !py-3.5 flex items-center justify-center gap-2 text-sm font-bold disabled:opacity-60 hover-glow animate-slide-up stagger-4 transition-transform active:scale-95"
               >
                 {booking ? (
                   <><FaSpinner className="animate-spin" /> Processing Payment…</>
@@ -457,7 +480,7 @@ const ExpertProfile = () => {
                 )}
               </button>
 
-              <p className="text-[11px] text-surface-400 text-center flex items-center justify-center gap-1">
+              <p className="text-[11px] text-surface-400 text-center flex items-center justify-center gap-1 animate-fade-in-up stagger-5">
                 <FaShieldAlt /> 256-bit Secure Razorpay SSL Payment
               </p>
             </div>
@@ -465,8 +488,10 @@ const ExpertProfile = () => {
 
           {/* STEP 1: BOOKING FORM */}
           {step === 'form' && (
-            <div className="card-saas p-6 sm:p-8">
-              <div className="flex items-center justify-between pb-6 border-b border-surface-100 mb-6">
+            <div className="card-saas p-6 sm:p-8 animate-slide-right">
+              {renderStepper()}
+
+              <div className="flex items-center justify-between pb-6 border-b border-surface-100 mb-6 animate-fade-in-up">
                 <div>
                   <h2 className="text-lg sm:text-xl font-bold text-surface-900 font-display">Book Consultation Session</h2>
                   <p className="text-xs text-surface-500 mt-0.5">Select a date and describe your crop or soil issue.</p>
@@ -480,19 +505,19 @@ const ExpertProfile = () => {
               </div>
 
               {user?.role === 'Expert' ? (
-                <div className="p-8 text-center bg-surface-50 rounded-2xl border border-surface-200">
+                <div className="p-8 text-center bg-surface-50 rounded-2xl border border-surface-200 animate-scale-in">
                   <FaUserMd className="text-4xl text-brand-600 mx-auto mb-3" />
                   <h3 className="text-sm font-bold text-surface-900 mb-1">Expert Profile Preview</h3>
                   <p className="text-xs text-surface-500 mb-4">
                     This is how your consultation profile is presented to farmers and buyers on Smart Krushi Bazar.
                   </p>
-                  <Link to="/expert/dashboard" className="btn-saas-primary text-xs">
+                  <Link to="/expert/dashboard" className="btn-saas-primary text-xs hover-glow">
                     Back to Expert Dashboard
                   </Link>
                 </div>
               ) : (
                 <form onSubmit={handleProceedToSummary} className="space-y-5">
-                  <div>
+                  <div className="animate-slide-up stagger-1">
                     <label className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1.5">
                       <FaCalendarAlt className="inline mr-1.5 text-brand-600" /> Appointment Date *
                     </label>
@@ -506,7 +531,7 @@ const ExpertProfile = () => {
                     />
                   </div>
 
-                  <div>
+                  <div className="animate-slide-up stagger-2">
                     <label className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1.5">
                       <FaClock className="inline mr-1.5 text-brand-600" /> Preferred Time Slot *
                     </label>
@@ -518,7 +543,7 @@ const ExpertProfile = () => {
                           onClick={() => setTimeSlot(slot)}
                           className={`px-3.5 py-2.5 rounded-xl text-xs font-semibold border transition-all text-left flex items-center justify-between ${
                             timeSlot === slot
-                              ? 'border-brand-600 bg-brand-50 text-brand-900 font-bold'
+                              ? 'border-brand-600 bg-brand-50 text-brand-900 font-bold animate-glow'
                               : 'border-surface-200 hover:border-brand-300 text-surface-700 bg-white'
                           }`}
                         >
@@ -529,7 +554,7 @@ const ExpertProfile = () => {
                     </div>
                   </div>
 
-                  <div>
+                  <div className="animate-slide-up stagger-3">
                     <label className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1.5">
                       Crop Issue & Symptoms *
                     </label>
@@ -544,7 +569,7 @@ const ExpertProfile = () => {
                   </div>
 
                   {/* Crop Photo Attachment (Optional) */}
-                  <div className="p-4 bg-surface-50 rounded-2xl border border-surface-200 space-y-2">
+                  <div className="p-4 bg-surface-50 rounded-2xl border border-surface-200 space-y-2 animate-slide-up stagger-4">
                     <label className="block text-xs font-bold text-surface-700 uppercase tracking-wider flex items-center gap-1.5">
                       <FaUpload className="text-brand-700" /> Attach Crop Photo (Optional)
                     </label>
@@ -552,11 +577,11 @@ const ExpertProfile = () => {
                       type="file"
                       accept="image/jpeg,image/png,image/webp,image/avif,image/*"
                       onChange={handleImageChange}
-                      className="w-full text-xs text-surface-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-100 file:text-brand-800 hover:file:bg-brand-200 cursor-pointer"
+                      className="w-full text-xs text-surface-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-100 file:text-brand-800 hover:file:bg-brand-200 cursor-pointer transition-colors"
                     />
 
                     {imagePreview ? (
-                      <div className="pt-2 flex items-start gap-3">
+                      <div className="pt-2 flex items-start gap-3 animate-scale-in">
                         <div className="relative">
                           <img
                             src={imagePreview}
@@ -590,7 +615,7 @@ const ExpertProfile = () => {
                   <button
                     type="submit"
                     disabled={booking || !expert}
-                    className="w-full btn-saas-primary !py-3 text-xs font-bold disabled:opacity-50"
+                    className="w-full btn-saas-primary !py-3 text-xs font-bold disabled:opacity-50 hover-glow animate-slide-up stagger-5 transition-transform active:scale-95"
                   >
                     {booking
                       ? 'Saving Appointment Details…'
@@ -624,7 +649,7 @@ const ExpertProfile = () => {
                   <p className="text-[11px] text-blue-200/80">Consultation with {expert.name}</p>
                 </div>
               </div>
-              <button onClick={handleSimulatedCancel} className="text-white/60 hover:text-white p-1 rounded-lg">
+              <button onClick={handleSimulatedCancel} className="text-white/60 hover:text-white p-1 rounded-lg transition-colors">
                 <FaTimes />
               </button>
             </div>
@@ -651,7 +676,7 @@ const ExpertProfile = () => {
               <div className="space-y-2.5 pt-2">
                 <button
                   onClick={handleSimulatedSuccess}
-                  className="w-full bg-[#0c2340] hover:bg-[#15345c] text-white py-3 px-4 rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-2"
+                  className="w-full bg-[#0c2340] hover:bg-[#15345c] text-white py-3 px-4 rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-2 transition-transform active:scale-95 hover-glow"
                 >
                   <FaCheckCircle className="text-emerald-400" />
                   Simulate Successful Payment (₹{fee})
@@ -659,7 +684,7 @@ const ExpertProfile = () => {
 
                 <button
                   onClick={handleSimulatedCancel}
-                  className="w-full bg-surface-100 hover:bg-red-50 text-red-600 hover:text-red-700 border border-surface-200 py-2.5 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5"
+                  className="w-full bg-surface-100 hover:bg-red-50 text-red-600 hover:text-red-700 border border-surface-200 py-2.5 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-transform active:scale-95"
                 >
                   <FaTimesCircle />
                   Simulate Payment Failure / Cancel

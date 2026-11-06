@@ -1,114 +1,114 @@
-# 🌾 Smart Krushi Bazar - Version 1
+# 🌾 Smart Krushi Bazar (स्मार्ट कृषि बाज़ार)
 
-A full-stack agricultural marketplace connecting Farmers directly with Buyers. Built as a college-level MERN stack project.
+A comprehensive, next-generation Agri-Tech full-stack marketplace connecting Farmers directly with Buyers, Agri-Experts, and Administrative moderation. Built with the MERN stack, Socket.io, Tailwind CSS, and AI-driven advisory features.
 
-## 🚀 Features
-- **Authentication**: JWT-based login/register with role-based access (Farmer/Buyer).
-- **Farmer Portal**: Add, edit, delete products; view and manage incoming orders (Pending → Accepted → Completed).
-- **Buyer Portal**: Browse, search, and filter products; place direct "Buy Now" orders; track order status.
-- **Stock Management**: Automatically decreases product quantity upon successful order. Prevents negative stock.
-- **Responsive UI**: Clean, green-themed Tailwind CSS design for mobile and desktop.
+---
+
+## 🚀 Key Features
+
+- **Multi-Role Authentication**: JWT-based role protection (Farmer, Buyer, Expert, Admin).
+- **Farmer Portal**:
+  - Add & manage crop listings with instant image uploads.
+  - Track orders with full status progression (Pending → Accepted → In Transit → Delivered).
+  - Crop Disease Detection & AI Crop Advisory algorithms.
+  - Digital Produce Passport & QR Code traceability.
+- **Buyer Portal**:
+  - Browse verified farm listings with live mandi price comparisons.
+  - Cart, Wishlist, Bulk Demand requests, and Freight Estimation.
+  - Secure Razorpay Payment integration (with automatic mock fallback simulator).
+  - Real-time Order Tracking stepper & PDF invoice generation.
+- **Direct Chat & Consultations**: Real-time Socket.io communication between farmers, buyers, and agriculture experts.
+- **Live Mandi Prices & Weather**: Real-time mandi rates, trend tracking, and live weather forecast cards.
+- **Admin Command Center**: Complete oversight of disputes, transaction logs, analytics, and user moderation.
+- **Multilingual & PWA-ready**: Native English / Hindi / Gujarati language support with mobile-responsive design.
+
+---
 
 ## 🛠️ Technology Stack
-- **Frontend**: React.js, Vite, Tailwind CSS, React Router DOM, Axios
-- **Backend**: Node.js, Express.js, MongoDB, Mongoose, JWT, bcryptjs
-- **Database**: Persistent Local MongoDB (`smart_krushi_bazar`)
+
+- **Frontend**: React 18, Vite, Tailwind CSS, Lucide Icons, Recharts, Socket.io-client, Axios, jsPDF, html2canvas.
+- **Backend**: Node.js, Express.js, MongoDB (Mongoose), Socket.io, JWT, bcryptjs, Razorpay, Multer, Cloudinary.
+- **Database**: MongoDB (Local or MongoDB Atlas for cloud deployment).
+
+---
 
 ## 📂 Folder Structure
+
 ```text
 smart-krushi-bazar/
-├── backend/          # Express API, Models, Controllers, Routes
-├── frontend/         # React Vite App, Components, Pages, Context
+├── backend/                  # Express REST API, Socket.io, Models, Controllers, Routes
+│   ├── src/
+│   │   ├── controllers/      # Handlers for auth, orders, products, mandi, chat, etc.
+│   │   ├── models/           # Mongoose schemas
+│   │   ├── routes/           # Express router endpoints
+│   │   ├── services/         # External integrations & business logic
+│   │   └── server.js         # Entry point & socket initialization
+│   └── uploads/              # Local media storage
+├── frontend/                 # Vite + React Client
+│   ├── src/
+│   │   ├── components/       # Reusable UI widgets, Modals, Navbar, Footer
+│   │   ├── context/          # Auth, Cart, Socket, Theme, Language contexts
+│   │   ├── pages/            # Farmer, Buyer, Expert, Admin views
+│   │   └── services/         # Axios API clients & WebSocket managers
+│   └── dist/                 # Production build output
+├── database/                 # Exported MongoDB collections & seed assets
+├── DEPLOYMENT_GUIDE.md       # Comprehensive cloud deployment instructions
 └── README.md
 ```
 
 ---
 
-## 🛠️ DEVELOPMENT-README (Local MongoDB Setup & Guide)
+## ⚙️ Quick Start (Local Setup)
 
-### 1. How to Install MongoDB on Windows
-1. Download **MongoDB Community Server** (MSI Installer) from the official website:
-   👉 [https://www.mongodb.com/try/download/community](https://www.mongodb.com/try/download/community)
-2. Run the `.msi` setup wizard.
-3. Select **"Complete"** installation type.
-4. Keep **"Install MongoDB as a Service"** checked (this allows MongoDB to run in the background automatically).
-5. Check **"Install MongoDB Compass"** (Graphical UI tool to visually inspect database collections).
-6. Complete the installation.
+### 1. Prerequisites
+- **Node.js** (v18.0 or newer)
+- **MongoDB** (Local Community Server running on `127.0.0.1:27017` or a MongoDB Atlas URI)
 
-### 2. How to Start / Verify MongoDB on Windows
-- **Via Windows Services**:
-  1. Press `Win + R`, type `services.msc`, and press Enter.
-  2. Find **MongoDB Server** in the list.
-  3. Ensure its status is **Running**. (If stopped, right-click and click **Start**).
-- **Via Command Prompt / PowerShell (Run as Administrator)**:
-  ```powershell
-  net start MongoDB
-  ```
-
-### 3. Connection String
-- **Default Connection String**: `mongodb://127.0.0.1:27017/smart_krushi_bazar`
-- **Database Name**: `smart_krushi_bazar`
-
-### 4. How to Inspect Database via MongoDB Compass
-1. Open **MongoDB Compass** from your Windows Start Menu.
-2. In the **New Connection** field, enter:
-   ```text
-   mongodb://127.0.0.1:27017
-   ```
-3. Click **Connect**.
-4. You will see the `smart_krushi_bazar` database in the left sidebar with the following collections:
-   - `users` (Farmer & Buyer registered accounts)
-   - `products` (Agricultural produce listings)
-   - `orders` (Purchase transactions)
-
----
-
-## ⚙️ Installation & Running the Application
-
-### 1. Backend Setup
+### 2. Backend Setup
 ```bash
 cd backend
 npm install
 npm run dev
 ```
-*Backend will connect to `mongodb://127.0.0.1:27017/smart_krushi_bazar` and run on `http://localhost:5000`*
+*Backend runs by default on `http://localhost:5000`*
 
-### 2. Frontend Setup
+### 3. Frontend Setup
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-*Frontend will run on `http://localhost:5173`*
+*Frontend runs by default on `http://localhost:5173`*
 
 ---
 
 ## 🔑 Environment Variables
-**backend/.env**
+
+**backend/.env** (reference `backend/.env.example`):
 ```env
 PORT=5000
 MONGODB_URI=mongodb://127.0.0.1:27017/smart_krushi_bazar
-JWT_SECRET=super_secret_college_project_key_123
+JWT_SECRET=your_jwt_secret_key_here
+NODE_ENV=development
+FRONTEND_URL=http://localhost:5173
+# Optional: Razorpay & Cloudinary keys
+RAZORPAY_KEY_ID=
+RAZORPAY_KEY_SECRET=
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
 ```
 
-**frontend/.env**
+**frontend/.env** (reference `frontend/.env.example`):
 ```env
 VITE_API_URL=http://localhost:5000/api
 ```
 
 ---
 
-## 🎓 College Demo Workflow (5 Minutes)
-1. **Register as Farmer**: Create account → Login → Dashboard.
-2. **Add Product**: Click "Add New Product" → Fill details (e.g., Tomato, Vegetables, ₹30, Qty: 50) → Save.
-3. **Logout**.
-4. **Register as Buyer**: Create account → Login → Dashboard.
-5. **Browse & Buy**: Go to Products → Search "Tomato" → Click "View Details" → Enter Qty: 5 → Click "Buy Now".
-6. **Check Order**: Go to "View My Orders" → See status "Pending".
-7. **Logout & Login as Farmer**: Go to "View Received Orders" → See the new order → Change status to "Accepted" → Then "Mark Completed".
-8. **Verify**: Switch back to Buyer → Check "My Orders" → Status is now "Completed".
+## 🌐 Cloud Deployment
 
----
-
-## 🚫 Out of Scope (V1)
-Payment gateways, real-time chat, AI features, weather APIs, and complex admin panels are intentionally excluded to maintain a focused, working MVP suitable for college evaluation.
+Refer to [`DEPLOYMENT_GUIDE.md`](./DEPLOYMENT_GUIDE.md) for full step-by-step instructions to deploy:
+- **Database**: Free MongoDB Atlas M0 cluster
+- **Backend API**: Render.com or Railway
+- **Frontend SPA**: Vercel or Netlify (with SPA rewrite support via `vercel.json`)

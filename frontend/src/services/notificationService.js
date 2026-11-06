@@ -1,18 +1,27 @@
 import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from './api';
 
 export const getNotifications = async () => {
-  const { data } = await axios.get(`${API_URL}/notifications`);
-  return data;
+  try {
+    const token = localStorage.getItem('token');
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    const { data } = await axios.get(`${API_URL}/notifications`, { headers });
+    return data;
+  } catch (e) {
+    return { notifications: [], unreadCount: 0 };
+  }
 };
 
 export const markAsRead = async (id) => {
-  const { data } = await axios.put(`${API_URL}/notifications/${id}/read`);
+  const token = localStorage.getItem('token');
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  const { data } = await axios.put(`${API_URL}/notifications/${id}/read`, {}, { headers });
   return data;
 };
 
 export const markAllAsRead = async () => {
-  const { data } = await axios.put(`${API_URL}/notifications/read-all`);
+  const token = localStorage.getItem('token');
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  const { data } = await axios.put(`${API_URL}/notifications/read-all`, {}, { headers });
   return data;
 };

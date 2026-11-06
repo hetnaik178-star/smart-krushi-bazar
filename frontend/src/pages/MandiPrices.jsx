@@ -1,8 +1,12 @@
 import { useState, useEffect, useContext, useMemo } from 'react';
 import { getMandiPrices, getMandiLocations } from '../services/mandiService';
 import { AuthContext } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import BackButton from '../components/BackButton';
 import EmptyState from '../components/EmptyState';
+import VoiceSearchButton from '../components/VoiceSearchButton';
+import MandiTrendModal from '../components/MandiTrendModal';
+import WhatsAppShareButton from '../components/WhatsAppShareButton';
 import {
   FaChartLine,
   FaSearch,
@@ -11,8 +15,6 @@ import {
   FaStore,
   FaFilter,
   FaCalendarAlt,
-  FaSortAmountDown,
-  FaSortAmountUp,
   FaCoins,
   FaSeedling
 } from 'react-icons/fa';
@@ -20,6 +22,7 @@ import toast from 'react-hot-toast';
 
 const MandiPrices = () => {
   const { user } = useContext(AuthContext);
+  const { t } = useLanguage();
 
   const [locationsData, setLocationsData] = useState({
     states: [],
@@ -41,6 +44,7 @@ const MandiPrices = () => {
 
   const [prices, setPrices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [trendTarget, setTrendTarget] = useState(null);
 
   useEffect(() => {
     const initLocations = async () => {
@@ -62,62 +66,80 @@ const MandiPrices = () => {
             } else if (locRes.data.states.length > 0) {
               setSelectedState(locRes.data.states[0]);
             }
-          } else {
+          } else if (locRes.data.states.includes('Gujarat')) {
             setSelectedState('Gujarat');
             initialDist = 'Navsari';
             initialMarket = 'Navsari';
+          } else if (locRes.data.states.length > 0) {
+            setSelectedState(locRes.data.states[0]);
           }
+
           setSelectedDistrict(initialDist);
           setSelectedMarket(initialMarket);
         }
       } catch (err) {
-        console.error('Failed to load mandi locations:', err);
+        console.error('Failed to load Mandi filter locations:', err);
       }
     };
     initLocations();
   }, [user]);
 
   const fetchPrices = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const params = {};
-      if (selectedState) params.state = selectedState;
-      if (selectedDistrict && selectedDistrict !== 'All Districts') params.district = selectedDistrict;
-      if (selectedMarket && selectedMarket !== 'All Markets') params.market = selectedMarket;
-      if (selectedCommodity && selectedCommodity !== 'All Commodities') params.commodity = selectedCommodity;
-      if (selectedVariety && selectedVariety !== 'All Varieties') params.variety = selectedVariety;
-      if (selectedDate && selectedDate !== 'All Dates') params.date = selectedDate;
-      if (searchQuery) params.search = searchQuery;
-      if (sortBy) params.sortBy = sortBy;
+      const query = {
+        state: selectedState,
+        district: selectedDistrict,
+        market: selectedMarket,
+        commodity: selectedCommodity,
+        variety: selectedVariety,
+        date: selectedDate,
+        search: searchQuery,
+        sort: sortBy
+      };
 
-      const res = await getMandiPrices(params);
-      if (res.success) {
-        setPrices(res.data || []);
+      const res = await getMandiPrices(query);
+      if (res.success && Array.isArray(res.data)) {
+        setPrices(res.data);
       }
     } catch (err) {
-      console.error('Failed to fetch mandi prices:', err);
-      toast.error('Could not refresh Mandi prices');
+      toast.error('Failed to update live Mandi rates');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchPrices();
-  }, [selectedState, selectedDistrict, selectedMarket, selectedCommodity, selectedVariety, selectedDate, sortBy]);
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    fetchPrices();
-  };
+    if (selectedState) {
+      fetchPrices();
+    }
+  }, [
+    selectedState,
+    selectedDistrict,
+    selectedMarket,
+    selectedCommodity,
+    selectedVariety,
+    selectedDate,
+    searchQuery,
+    sortBy
+  ]);
 
   const handleStateChange = (e) => {
     const newState = e.target.value;
     setSelectedState(newState);
     setSelectedDistrict('All Districts');
     setSelectedMarket('All Markets');
-    setSelectedCommodity('All Commodities');
-    setSelectedVariety('All Varieties');
+  };
+
+  const handleDistrictChange = (e) => {
+    const newDist = e.target.value;
+    setSelectedDistrict(newDist);
+    setSelectedMarket('All Markets');
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    fetchPrices();
   };
 
   const availableDistricts = useMemo(() => {
@@ -126,7 +148,7 @@ const MandiPrices = () => {
   }, [selectedState, locationsData]);
 
   const availableMarkets = useMemo(() => {
-    if (!selectedDistrict || selectedDistrict === 'All Districts') return ['All Markets'];
+    if (!selectedState || !selectedDistrict || selectedDistrict === 'All Districts') return ['All Markets'];
     const key = `${selectedState}_${selectedDistrict}`;
     if (!locationsData.marketsByDistrict[key]) return ['All Markets'];
     return ['All Markets', ...locationsData.marketsByDistrict[key]];
@@ -135,7 +157,7 @@ const MandiPrices = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 page-fade-in">
       <div className="mb-6">
-        <BackButton fallback="/" label="Back to Home" />
+        <BackButton fallback="/" label={t('nav.backToHome', 'Back to Home')} />
       </div>
 
       {/* Visual Agro Hero Banner */}
@@ -145,40 +167,52 @@ const MandiPrices = () => {
         <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 bg-harvest-500/20 text-harvest-300 text-xs font-extrabold px-3.5 py-1.5 rounded-full mb-3 border border-harvest-400/30 backdrop-blur-md">
-              <FaCoins className="text-harvest-400" /> Official AGMARKNET Government Data Feed
+              <FaCoins className="text-harvest-400" /> {t('mandi.officialAgmarknet', 'Official AGMARKNET Government Data Feed')}
             </div>
             <h1 className="text-2xl sm:text-4xl font-black font-display tracking-tight text-white mb-2">
-              Live APMC Mandi Prices
+              {t('mandi.title', 'Live APMC Mandi Prices')}
             </h1>
             <p className="text-xs sm:text-sm text-emerald-100/80 font-medium leading-relaxed">
-              Real-time modal, minimum, and maximum market rates across APMC mandis in Gujarat and India.
+              {t('mandi.subtitle', 'Real-time modal, minimum, and maximum market rates across APMC mandis in Gujarat and India.')}
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <WhatsAppShareButton
+              title={`Live APMC Mandi Rates (${selectedDistrict || selectedState || 'All India'})`}
+              text={`Check current live government APMC agricultural market prices directly on Smart Krushi Bazar:`}
+              className="!py-3 !px-4 text-xs font-bold"
+            />
             <button
               onClick={fetchPrices}
               className="btn-saas-secondary text-xs !py-3 !px-5 shadow-sm font-bold flex items-center gap-2 bg-white/95"
             >
-              <FaSync className={`${loading ? 'animate-spin' : ''} text-brand-700`} /> Refresh Mandi Rates
+              <FaSync className={`${loading ? 'animate-spin' : ''} text-brand-700`} /> {t('mandi.refreshRates', 'Refresh Mandi Rates')}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Filter Toolbar */}
+      {/* Filter Toolbar with Voice Search */}
       <div className="glass-card p-5 mb-8 space-y-4">
         <div className="flex flex-col sm:flex-row gap-3">
-          <form onSubmit={handleSearchSubmit} className="relative flex-1">
-            <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-400 text-xs" />
+          <div className="relative flex-1 flex items-center">
+            <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-400 text-xs pointer-events-none" />
             <input
               type="text"
-              placeholder="Search crop or commodity (e.g. Wheat, Mango, Cotton, Onion)..."
+              placeholder={t('mandi.searchPlaceholder', 'Search Mandi, commodity, or district...')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="input-saas !pl-9 text-xs"
+              className="input-saas !pl-9 !pr-10 text-xs w-full"
             />
-          </form>
+            <div className="absolute right-2 top-1/2 -translate-y-1/2">
+              <VoiceSearchButton
+                onSpeechResult={(spokenText) => {
+                  setSearchQuery(spokenText);
+                }}
+              />
+            </div>
+          </div>
 
           <div className="flex items-center gap-2">
             <select
@@ -213,7 +247,7 @@ const MandiPrices = () => {
             <label className="block text-[11px] font-bold text-surface-600 uppercase tracking-wider mb-1 font-display">District</label>
             <select
               value={selectedDistrict}
-              onChange={(e) => setSelectedDistrict(e.target.value)}
+              onChange={handleDistrictChange}
               className="input-saas text-xs font-semibold text-surface-900"
             >
               {availableDistricts.map((dst) => (
@@ -223,7 +257,7 @@ const MandiPrices = () => {
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-surface-600 uppercase tracking-wider mb-1 font-display">APMC Market</label>
+            <label className="block text-[11px] font-bold text-surface-600 uppercase tracking-wider mb-1 font-display">Market / Mandi</label>
             <select
               value={selectedMarket}
               onChange={(e) => setSelectedMarket(e.target.value)}
@@ -251,35 +285,45 @@ const MandiPrices = () => {
       </div>
 
       {/* Data Table (Desktop) */}
-      <div className="hidden md:block card-saas overflow-hidden shadow-premium">
+      <div className="hidden md:block card-luxe overflow-hidden shadow-2xl border border-emerald-500/20">
         <div className="overflow-x-auto scrollbar-saas">
           <table className="w-full text-xs text-left">
             <thead className="bg-surface-50 text-surface-600 uppercase text-[11px] font-bold tracking-wider border-b border-surface-200">
               <tr>
-                <th className="px-6 py-4">Commodity</th>
-                <th className="px-6 py-4">Variety</th>
-                <th className="px-6 py-4">APMC Market</th>
-                <th className="px-6 py-4">District / State</th>
-                <th className="px-6 py-4 text-right">Min (₹/Qtl)</th>
-                <th className="px-6 py-4 text-right bg-emerald-50 text-brand-900 font-black">Modal Rate (₹/Qtl)</th>
-                <th className="px-6 py-4 text-right">Max (₹/Qtl)</th>
-                <th className="px-6 py-4 text-right">Arrival Date</th>
+                <th className="px-5 py-4">{t('mandi.commodity', 'Commodity')}</th>
+                <th className="px-5 py-4">{t('mandi.variety', 'Variety')}</th>
+                <th className="px-5 py-4">{t('mandi.market', 'APMC Market')}</th>
+                <th className="px-5 py-4">{t('mandi.districtState', 'District / State')}</th>
+                <th className="px-4 py-4 text-right">{t('mandi.minPrice', 'Min (₹/Qtl)')}</th>
+                <th className="px-5 py-4 text-right bg-emerald-50 text-brand-900 font-black">{t('mandi.modalPrice', 'Modal Rate (₹/Qtl)')}</th>
+                <th className="px-4 py-4 text-right">{t('mandi.maxPrice', 'Max (₹/Qtl)')}</th>
+                <th className="px-4 py-4 text-center">{t('mandi.trendChart', 'Trend Chart')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-100 font-medium">
               {prices.map((p, i) => (
                 <tr key={i} className="hover:bg-emerald-50/40 transition-colors">
-                  <td className="px-6 py-4 font-bold text-surface-900 text-xs font-display">{p.commodity || p.crop}</td>
-                  <td className="px-6 py-4 text-surface-600">{p.variety || 'Local'}</td>
-                  <td className="px-6 py-4 text-surface-800 font-bold">{p.market || p.mandi}</td>
-                  <td className="px-6 py-4 text-surface-500">{p.district}, {p.state}</td>
-                  <td className="px-6 py-4 text-right text-surface-500">₹{p.minPrice?.toLocaleString()}</td>
-                  <td className="px-6 py-4 text-right font-black text-brand-800 bg-emerald-50/60 text-sm font-display">
+                  <td className="px-5 py-4 font-bold text-surface-900 text-xs font-display">
+                    {p.commodity || p.crop}
+                  </td>
+                  <td className="px-5 py-4 text-surface-600">{p.variety || 'Standard'}</td>
+                  <td className="px-5 py-4 text-surface-800 font-bold">{p.market || p.mandi}</td>
+                  <td className="px-5 py-4 text-surface-500">{p.district}, {p.state}</td>
+                  <td className="px-4 py-4 text-right text-surface-500">₹{p.minPrice?.toLocaleString()}</td>
+                  <td className="px-5 py-4 text-right font-black text-brand-800 bg-emerald-50/60 text-sm font-display">
                     ₹{p.modalPrice?.toLocaleString()}
                   </td>
-                  <td className="px-6 py-4 text-right text-surface-500">₹{p.maxPrice?.toLocaleString()}</td>
-                  <td className="px-6 py-4 text-right text-surface-400 text-[11px]">
-                    {p.arrivalDate ? new Date(p.arrivalDate).toLocaleDateString('en-IN') : 'Today'}
+                  <td className="px-4 py-4 text-right text-surface-500">₹{p.maxPrice?.toLocaleString()}</td>
+                  <td className="px-4 py-4 text-center">
+                    <button
+                      type="button"
+                      onClick={() => setTrendTarget({ commodity: p.commodity || p.crop, market: p.market || p.mandi })}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-brand-800 border border-emerald-300/80 font-bold text-[11px] shadow-sm hover:scale-105 transition-all"
+                      title="View Historical Price Trend"
+                    >
+                      <FaChartLine className="text-emerald-600 text-[10px]" />
+                      <span>{t('mandi.viewTrend', 'Trend')}</span>
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -310,7 +354,8 @@ const MandiPrices = () => {
                 {p.variety || 'Local'}
               </span>
             </div>
-            <div className="grid grid-cols-3 gap-2 pt-3 border-t border-surface-100 text-xs">
+            
+            <div className="grid grid-cols-3 gap-2 pt-3 border-t border-surface-100 text-xs mb-3">
               <div className="text-center">
                 <p className="text-[10px] text-surface-400 uppercase font-bold">Min</p>
                 <p className="font-bold text-surface-700">₹{p.minPrice}</p>
@@ -324,9 +369,27 @@ const MandiPrices = () => {
                 <p className="font-bold text-surface-700">₹{p.maxPrice}</p>
               </div>
             </div>
+
+            <button
+              type="button"
+              onClick={() => setTrendTarget({ commodity: p.commodity || p.crop, market: p.market || p.mandi })}
+              className="w-full py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-brand-800 font-bold text-xs flex items-center justify-center gap-2 border border-emerald-200 transition-colors"
+            >
+              <FaChartLine className="text-emerald-600" />
+              <span>{t('mandi.viewTrend', 'View Price Trend History')}</span>
+            </button>
           </div>
         ))}
       </div>
+
+      {/* Historical Mandi Price Trend Modal */}
+      {trendTarget && (
+        <MandiTrendModal
+          commodity={trendTarget.commodity}
+          market={trendTarget.market}
+          onClose={() => setTrendTarget(null)}
+        />
+      )}
     </div>
   );
 };

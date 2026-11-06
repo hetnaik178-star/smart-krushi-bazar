@@ -34,6 +34,30 @@ app.use('/api/cart', require('./routes/cartRoutes'));
 app.use('/api/mandi', require('./routes/mandiRoutes'));
 app.use('/api/disease', require('./routes/diseaseRoutes'));
 app.use('/api/disputes', require('./routes/disputeRoutes'));
+app.use('/api/recommendation', require('./routes/recommendationRoutes'));
+app.use('/api/demands', require('./routes/demandRoutes'));
+app.use('/api/reviews', require('./routes/reviewRoutes'));
+
+const os = require('os');
+
+app.get('/api/network-info', (req, res) => {
+  try {
+    const nets = os.networkInterfaces();
+    let networkIp = 'localhost';
+    for (const name of Object.keys(nets)) {
+      for (const net of nets[name]) {
+        if (net.family === 'IPv4' && !net.internal) {
+          networkIp = net.address;
+          break;
+        }
+      }
+      if (networkIp !== 'localhost') break;
+    }
+    res.json({ networkIp, port: process.env.PORT || 5000 });
+  } catch (e) {
+    res.json({ networkIp: 'localhost' });
+  }
+});
 
 app.get('/', (req, res) => res.json({ message: 'Smart Krushi Bazar API is running!' }));
 

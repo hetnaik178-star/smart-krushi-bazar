@@ -63,15 +63,16 @@ const FarmerConsultations = () => {
         <BackButton fallback={isExpert ? '/' : '/farmer/dashboard'} label="Back to Dashboard" />
       </div>
 
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-        <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold mb-2">
-            <FaUserMd className="text-brand-600" /> Agronomy Advisory Records
+      <div className="bg-gradient-to-r from-brand-950 via-brand-900 to-emerald-900 rounded-3xl p-6 sm:p-8 text-white shadow-premium mb-8 relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative z-10">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-emerald-100 border border-white/20 text-xs font-bold mb-3 backdrop-blur-md shadow-sm">
+            <FaUserMd className="text-emerald-300" /> Agronomy Advisory Records
           </div>
-          <h1 className="page-heading">
+          <h1 className="text-2xl sm:text-3xl font-black font-display text-white tracking-tight mb-2">
             {isExpert ? 'Client Advisory Schedule' : 'My Expert Consultations'}
           </h1>
-          <p className="text-xs sm:text-sm text-surface-500 font-medium mt-1">
+          <p className="text-xs sm:text-sm text-emerald-100/90 font-medium max-w-xl">
             {isExpert
               ? 'Manage incoming farmer requests, diagnosis uploads, and advisory slots.'
               : 'Track your scheduled diagnostic appointments with verified agronomists.'}
@@ -79,7 +80,7 @@ const FarmerConsultations = () => {
         </div>
 
         {!isExpert && (
-          <Link to="/experts" className="btn-saas-primary text-xs flex items-center gap-1.5 shadow-sm">
+          <Link to="/experts" className="relative z-10 btn-saas-primary text-xs flex items-center gap-1.5 shadow-sm bg-white text-brand-900 hover:bg-emerald-50 hover-glow transition-all">
             <FaUserMd /> Find New Expert
           </Link>
         )}
@@ -92,7 +93,7 @@ const FarmerConsultations = () => {
           ))}
         </div>
       ) : consultations.length === 0 ? (
-        <div className="card-saas p-8">
+        <div className="card-saas p-8 animate-fade-in">
           <EmptyState
             icon={FaCalendarAlt}
             title="No Consultations Scheduled"
@@ -107,16 +108,23 @@ const FarmerConsultations = () => {
         </div>
       ) : (
         <div className="space-y-4">
-          {consultations.map((c) => {
+          {consultations.map((c, idx) => {
             const otherParty = isExpert ? c.farmerId : c.expertId;
             return (
-              <div key={c._id} className="card-saas p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:border-emerald-300">
+              <div key={c._id} className={`card-saas p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:border-emerald-300 transition-all animate-slide-up stagger-${(idx % 8) + 1}`}>
                 <div className="flex items-start gap-4 flex-1">
-                  <Avatar src={otherParty?.profileImage} name={otherParty?.name || 'User'} size="lg" />
+                  <div className="relative">
+                    <Avatar src={otherParty?.profileImage} name={otherParty?.name || 'User'} size="lg" className="ring-2 ring-emerald-300 animate-glow" />
+                    {!isExpert && (
+                      <div className="absolute -bottom-1 -right-1 bg-brand-600 text-white rounded-full p-1 ring-2 ring-white" title="Verified Specialist">
+                        <FaCheck className="text-[8px]" />
+                      </div>
+                    )}
+                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2 mb-1">
                       <h3 className="font-bold text-sm text-surface-900 font-display">{otherParty?.name || 'Specialist'}</h3>
-                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${getStatusBadge(c.status)}`}>
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider transition-colors ${getStatusBadge(c.status)}`}>
                         {c.status}
                       </span>
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
@@ -147,7 +155,7 @@ const FarmerConsultations = () => {
                         <SmartImage
                           src={c.imageUrl}
                           alt="Crop symptom"
-                          className="w-16 h-16 rounded-xl object-cover border border-surface-200 shadow-sm"
+                          className="w-16 h-16 rounded-xl object-cover border border-surface-200 shadow-sm hover:scale-105 transition-transform"
                         />
                       </div>
                     )}
@@ -157,7 +165,7 @@ const FarmerConsultations = () => {
                 <div className="flex flex-col sm:flex-row gap-2 self-end md:self-center shrink-0">
                   <Link
                     to={`/chat?receiverId=${otherParty?._id}`}
-                    className="btn-saas-secondary text-xs flex items-center gap-1.5"
+                    className="btn-saas-secondary text-xs flex items-center gap-1.5 hover-glow"
                   >
                     <FaComments className="text-brand-600" /> Message
                   </Link>
@@ -166,13 +174,13 @@ const FarmerConsultations = () => {
                     <>
                       <button
                         onClick={() => handleStatusUpdate(c._id, 'Confirmed')}
-                        className="btn-saas-primary text-xs !py-2.5"
+                        className="btn-saas-primary text-xs !py-2.5 transition-transform active:scale-95"
                       >
                         Accept
                       </button>
                       <button
                         onClick={() => handleStatusUpdate(c._id, 'Rejected')}
-                        className="btn-saas-secondary text-xs !py-2.5 text-red-600 border-red-200 hover:bg-red-50"
+                        className="btn-saas-secondary text-xs !py-2.5 text-red-600 border-red-200 hover:bg-red-50 transition-transform active:scale-95"
                       >
                         Reject
                       </button>
@@ -182,7 +190,7 @@ const FarmerConsultations = () => {
                   {isExpert && c.status === 'Confirmed' && (
                     <button
                       onClick={() => handleStatusUpdate(c._id, 'Completed')}
-                      className="btn-saas-secondary text-xs !py-2.5 text-emerald-700 border-emerald-200 hover:bg-emerald-50 font-bold"
+                      className="btn-saas-secondary text-xs !py-2.5 text-emerald-700 border-emerald-200 hover:bg-emerald-50 font-bold transition-transform active:scale-95"
                     >
                       Mark Completed
                     </button>

@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { API_URL } from '../../services/api';
 import BackButton from '../../components/BackButton';
 import EmptyState from '../../components/EmptyState';
 import SmartImage from '../../components/SmartImage';
 import Avatar from '../../components/Avatar';
 import { FaCalendarAlt, FaClock, FaComments, FaCheck, FaTimes, FaImage, FaUserMd } from 'react-icons/fa';
 import toast from 'react-hot-toast';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const ExpertConsultations = () => {
   const [consultations, setConsultations] = useState([]);
@@ -80,7 +79,7 @@ const ExpertConsultations = () => {
               key={f}
               onClick={() => setFilter(f)}
               className={`px-3 py-1.5 rounded-xl transition-all ${
-                filter === f ? 'bg-white text-brand-900 shadow-sm font-extrabold' : 'text-surface-600 hover:text-surface-900'
+                filter === f ? 'bg-white text-brand-900 shadow-sm font-extrabold animate-scale-in' : 'text-surface-600 hover:text-surface-900'
               }`}
             >
               {f}
@@ -94,7 +93,7 @@ const ExpertConsultations = () => {
           {[1, 2, 3].map(n => <div key={n} className="card-saas h-36 skeleton-shimmer"></div>)}
         </div>
       ) : filteredConsultations.length === 0 ? (
-        <div className="card-saas p-8">
+        <div className="card-saas p-8 animate-fade-in">
           <EmptyState
             icon={FaCalendarAlt}
             title="No Consultations Found"
@@ -103,14 +102,14 @@ const ExpertConsultations = () => {
         </div>
       ) : (
         <div className="space-y-4">
-          {filteredConsultations.map(item => (
-            <div key={item._id} className="card-saas p-6 flex flex-col md:flex-row md:items-start justify-between gap-6 hover:border-emerald-300">
+          {filteredConsultations.map((item, idx) => (
+            <div key={item._id} className={`card-saas p-6 flex flex-col md:flex-row md:items-start justify-between gap-6 hover:border-emerald-300 transition-all stagger-${(idx % 8) + 1} animate-slide-up`}>
               <div className="flex flex-col sm:flex-row items-start gap-4 flex-1">
-                <Avatar src={item.farmerId?.profileImage} name={item.farmerId?.name} size="xl" className="ring-2 ring-emerald-200" />
+                <Avatar src={item.farmerId?.profileImage} name={item.farmerId?.name} size="xl" className="ring-2 ring-emerald-200 animate-glow" />
                 <div className="space-y-2 flex-1">
                   <div className="flex flex-wrap items-center gap-3">
                     <h3 className="font-bold text-surface-900 text-base font-display">{item.farmerId?.name || 'Registered Farmer'}</h3>
-                    <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold border uppercase tracking-wider ${
+                    <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold border uppercase tracking-wider transition-colors ${
                       item.status === 'Pending' ? 'bg-amber-50 text-amber-800 border-amber-200' :
                       item.status === 'Confirmed' ? 'bg-blue-50 text-blue-800 border-blue-200' :
                       item.status === 'Completed' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' :
@@ -169,13 +168,13 @@ const ExpertConsultations = () => {
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleStatusUpdate(item._id, 'Confirmed')}
-                      className="btn-saas-primary text-xs flex-1 !py-1.5"
+                      className="btn-saas-primary text-xs flex-1 !py-1.5 transition-transform active:scale-95"
                     >
                       <FaCheck /> Accept
                     </button>
                     <button
                       onClick={() => handleStatusUpdate(item._id, 'Rejected')}
-                      className="btn-saas-secondary text-xs text-red-600 border-red-200 hover:bg-red-50 flex-1 !py-1.5"
+                      className="btn-saas-secondary text-xs text-red-600 border-red-200 hover:bg-red-50 flex-1 !py-1.5 transition-transform active:scale-95"
                     >
                       <FaTimes /> Reject
                     </button>
@@ -185,7 +184,7 @@ const ExpertConsultations = () => {
                 {item.status === 'Confirmed' && (
                   <button
                     onClick={() => handleStatusUpdate(item._id, 'Completed')}
-                    className="btn-harvest text-xs !py-1.5 font-bold"
+                    className="btn-harvest text-xs !py-1.5 font-bold transition-transform active:scale-95"
                   >
                     <FaCheck /> Mark Completed
                   </button>

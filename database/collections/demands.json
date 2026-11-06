@@ -1,0 +1,40 @@
+[
+  {
+    "_id": "6aa0cfa05d8014d8360952ec",
+    "buyerId": "6a8aef633622a73777a1b2c6",
+    "buyerName": "Meet Naik (Wholesaler)",
+    "buyerPhone": "9823456789",
+    "cropName": "Fresh Hybrid Tomatoes",
+    "category": "Vegetables",
+    "quantity": 200,
+    "unit": "kg",
+    "targetPrice": 26,
+    "deliveryLocation": "Bardoli, Gujarat",
+    "requiredByDate": "2026-09-14T03:16:48.793Z",
+    "qualityNotes": "Firm red grade A, suitable for retail supermarket packing. Low transit damage.",
+    "status": "Active",
+    "responsesCount": 2,
+    "__v": 0,
+    "createdAt": "2026-09-09T03:16:48.813Z",
+    "updatedAt": "2026-09-09T03:19:42.445Z"
+  },
+  {
+    "_id": "6aa0cfa05d8014d8360952ed",
+    "buyerId": "6a8aef633622a73777a1b2c6",
+    "buyerName": "Meet Naik (Wholesaler)",
+    "buyerPhone": "9823456789",
+    "cropName": "Valsadi Alphonso Mangoes",
+    "category": "Fruits",
+    "quantity": 25,
+    "unit": "Crates",
+    "targetPrice": 110,
+    "deliveryLocation": "Bardoli, Gujarat",
+    "requiredByDate": "2026-09-17T03:16:48.793Z",
+    "qualityNotes": "Tree-ripened without chemical calcium carbide. Export quality grade.",
+    "status": "Active",
+    "responsesCount": 3,
+    "__v": 0,
+    "createdAt": "2026-09-09T03:16:48.815Z",
+    "updatedAt": "2026-09-10T04:07:57.372Z"
+  }
+]

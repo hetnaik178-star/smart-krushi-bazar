@@ -4,7 +4,8 @@ const {
   getMyOrders,
   getReceivedOrders,
   updateOrderStatus,
-  initiateOrder
+  initiateOrder,
+  getOrderById
 } = require('../controllers/orderController');
 const { protect } = require('../middleware/authMiddleware');
 const { roleCheck } = require('../middleware/roleMiddleware');
@@ -16,7 +17,9 @@ router.get('/my', protect, roleCheck(['Buyer']), getMyOrders);
 router.get('/my-orders', protect, roleCheck(['Buyer']), getMyOrders);
 router.get('/received', protect, roleCheck(['Farmer']), getReceivedOrders);
 router.get('/farmer-orders', protect, roleCheck(['Farmer']), getReceivedOrders);
-router.put('/:id/status', protect, roleCheck(['Farmer']), updateOrderStatus);
-router.patch('/:id/status', protect, updateOrderStatus);
+router.get('/:id', getOrderById); // Public route for Digital Passport QR Scan verification
+router.put('/:id/status', protect, roleCheck(['Farmer', 'Admin']), updateOrderStatus);
+router.patch('/:id/status', protect, roleCheck(['Farmer', 'Admin']), updateOrderStatus);
+router.patch('/:id/tracking', protect, roleCheck(['Farmer', 'Admin']), updateOrderStatus);
 
 module.exports = router;

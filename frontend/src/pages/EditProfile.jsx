@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import Avatar from '../components/Avatar';
 import BackButton from '../components/BackButton';
 import { getMyProfile, updateProfile, uploadProfilePhoto, removeProfilePhoto } from '../services/profileService';
@@ -8,6 +9,7 @@ import { FaCamera, FaTrash, FaSave, FaTimes, FaUser, FaPhone, FaMapMarkerAlt, Fa
 import toast from 'react-hot-toast';
 
 const EditProfile = () => {
+  const { t } = useLanguage();
   const { user, login } = useContext(AuthContext);
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
@@ -132,16 +134,16 @@ const EditProfile = () => {
   return (
     <div className="page-fade-in max-w-2xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
-        <BackButton fallback="/profile" label="Back to Profile" />
+        <BackButton fallback="/profile" label={t('nav.profile', 'Back to Profile')} />
         <button onClick={() => navigate('/profile')} className="btn-saas-secondary !py-2 !px-4 text-xs">
-          <FaTimes className="mr-1" /> Cancel
+          <FaTimes className="mr-1" /> {t('common.cancel', 'Cancel')}
         </button>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Photo Upload Section */}
         <div className="card-saas p-6 shadow-premium">
-          <h2 className="text-xs font-bold text-surface-500 uppercase tracking-wider mb-4 font-display">Profile Image</h2>
+          <h2 className="text-xs font-bold text-surface-500 uppercase tracking-wider mb-4 font-display">{t('profile.profileImage', 'Profile Image')}</h2>
           <div className="flex items-center gap-6">
             <div className="relative">
               <Avatar src={preview || profile?.profileImage} name={profile?.name} size="2xl" className="ring-2 ring-emerald-200" />
@@ -158,7 +160,7 @@ const EditProfile = () => {
                 className="btn-saas-primary text-xs !py-2 !px-4 shadow-sm"
                 disabled={uploading}
               >
-                <FaCamera className="mr-1.5" /> {profile?.profileImage ? 'Change Photo' : 'Upload Photo'}
+                <FaCamera className="mr-1.5" /> {profile?.profileImage ? t('profile.changePhoto', 'Change Photo') : t('profile.uploadPhoto', 'Upload Photo')}
               </button>
               {profile?.profileImage && (
                 <button
@@ -166,7 +168,7 @@ const EditProfile = () => {
                   onClick={handleRemovePhoto}
                   className="btn-saas-secondary text-xs !py-2 !px-4 text-red-600 border-red-200 hover:bg-red-50"
                 >
-                  <FaTrash className="mr-1.5" /> Remove
+                  <FaTrash className="mr-1.5" /> {t('common.delete', 'Remove')}
                 </button>
               )}
             </div>
@@ -183,9 +185,9 @@ const EditProfile = () => {
 
         {/* Basic Info */}
         <div className="card-saas p-6 shadow-premium space-y-4">
-          <h2 className="text-xs font-bold text-surface-500 uppercase tracking-wider mb-2 font-display">Personal Details</h2>
+          <h2 className="text-xs font-bold text-surface-500 uppercase tracking-wider mb-2 font-display">{t('profile.accountInfo', 'Personal Details')}</h2>
           <div>
-            <label htmlFor="name" className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1 font-display">Full Legal Name *</label>
+            <label htmlFor="name" className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1 font-display">{t('auth.fullNameLabel', 'Full Legal Name')} *</label>
             <input
               id="name"
               type="text"
@@ -197,7 +199,7 @@ const EditProfile = () => {
             />
           </div>
           <div>
-            <label htmlFor="phone" className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1 font-display">Mobile Contact *</label>
+            <label htmlFor="phone" className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1 font-display">{t('auth.phoneLabel', 'Mobile Contact')} *</label>
             <input
               id="phone"
               type="tel"
@@ -209,7 +211,7 @@ const EditProfile = () => {
             />
           </div>
           <div>
-            <label htmlFor="location" className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1 font-display">City / State / District *</label>
+            <label htmlFor="location" className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1 font-display">{t('auth.locationLabel', 'City / State / District')} *</label>
             <input
               id="location"
               type="text"
@@ -221,7 +223,7 @@ const EditProfile = () => {
             />
           </div>
           <div>
-            <label htmlFor="bio" className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1 font-display">Biography</label>
+            <label htmlFor="bio" className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1 font-display">{t('profile.bioLabel', 'Biography')}</label>
             <textarea
               id="bio"
               name="bio"
@@ -239,9 +241,9 @@ const EditProfile = () => {
         {/* Farmer-specific fields */}
         {profile?.role === 'Farmer' && (
           <div className="card-saas p-6 shadow-premium space-y-4">
-            <h2 className="text-xs font-bold text-surface-500 uppercase tracking-wider mb-2 font-display">Agricultural Farm Information</h2>
+            <h2 className="text-xs font-bold text-surface-500 uppercase tracking-wider mb-2 font-display">{t('profile.farmSpecs', 'Agricultural Farm Information')}</h2>
             <div>
-              <label htmlFor="farmName" className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1 font-display">Farm Name</label>
+              <label htmlFor="farmName" className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1 font-display">{t('auth.farmNameLabel', 'Farm Name')}</label>
               <input
                 id="farmName"
                 type="text"
@@ -253,7 +255,7 @@ const EditProfile = () => {
               />
             </div>
             <div>
-              <label htmlFor="specialization" className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1 font-display">Farming Specialization</label>
+              <label htmlFor="specialization" className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1 font-display">{t('auth.specializationLabel', 'Farming Specialization')}</label>
               <input
                 id="specialization"
                 type="text"
@@ -272,7 +274,7 @@ const EditProfile = () => {
           disabled={saving}
           className="w-full btn-saas-primary text-xs !py-3.5 shadow-sm font-bold flex items-center justify-center gap-2"
         >
-          <FaSave /> {saving ? 'Saving Updates...' : 'Save Profile Changes'}
+          <FaSave /> {saving ? t('profile.saving', 'Saving Updates...') : t('profile.saveChanges', 'Save Profile Changes')}
         </button>
       </form>
     </div>

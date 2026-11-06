@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { LanguageProvider } from './context/LanguageContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { SocketProvider } from './context/SocketContext';
@@ -9,6 +11,9 @@ import ProtectedRoute from './utils/ProtectedRoute';
 import SplashScreen from './components/SplashScreen';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import MobileBottomNav from './components/MobileBottomNav';
+import DynamicAgroBackground from './components/DynamicAgroBackground';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Pages - Core & Marketplace
 import Home from './pages/Home';
@@ -41,6 +46,7 @@ import CartPage from './pages/buyer/CartPage';
 import Checkout from './pages/buyer/Checkout';
 import OrderCheckout from './pages/buyer/OrderCheckout';
 import MyDisputes from './pages/buyer/MyDisputes';
+import BulkDemand from './pages/buyer/BulkDemand';
 
 // Pages - Admin
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -51,11 +57,16 @@ import MyProfile from './pages/MyProfile';
 import EditProfile from './pages/EditProfile';
 import FarmerPublicProfile from './pages/FarmerPublicProfile';
 
-// Pages - V4 Features
+// Pages - V4 Innovation Features
 import Experts from './pages/Experts';
 import ExpertProfile from './pages/ExpertProfile';
 import MandiPrices from './pages/MandiPrices';
 import Chat from './pages/Chat';
+import CropRecommendation from './pages/CropRecommendation';
+import FertilizerCalculator from './pages/FertilizerCalculator';
+import GovtSchemes from './pages/GovtSchemes';
+import DigitalPassport from './pages/DigitalPassport';
+import FreightEstimator from './pages/FreightEstimator';
 
 // Wrapper for page fade-in transitions on route change
 const PageTransitionWrapper = ({ children }) => {
@@ -68,12 +79,29 @@ const PageTransitionWrapper = ({ children }) => {
 };
 
 function AppContent() {
+  const location = useLocation();
+  const isStandalonePassport = location.pathname.startsWith('/passport') || location.pathname.startsWith('/verify');
+
+  useEffect(() => {
+    // Detect server network IP so invoice QR codes work when scanned by phones on Wi-Fi / Hotspot
+    fetch('/api/network-info')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.networkIp && data.networkIp !== 'localhost') {
+          window.__DETECTED_NETWORK_IP__ = data.networkIp;
+          try { sessionStorage.setItem('detected_network_ip', data.networkIp); } catch (e) {}
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
-    <div className="flex flex-col min-h-screen bg-surface-50 text-surface-900 selection:bg-emerald-500 selection:text-white">
+    <div className={`relative flex flex-col min-h-screen ${isStandalonePassport ? 'bg-slate-950 text-slate-100' : 'bg-transparent text-surface-900'} selection:bg-emerald-500 selection:text-white`}>
+      {!isStandalonePassport && <DynamicAgroBackground />}
       <Toaster position="top-center" reverseOrder={false} />
-      <Navbar />
+      {!isStandalonePassport && <Navbar />}
       <PageTransitionWrapper>
-        <main className="flex-grow flex flex-col">
+        <main className={`relative z-10 flex-grow flex flex-col w-full max-w-full overflow-x-hidden ${isStandalonePassport ? 'p-0 m-0' : 'pb-20 lg:pb-0'}`}>
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Home />} />
@@ -85,6 +113,20 @@ function AppContent() {
             <Route path="/experts" element={<Experts />} />
             <Route path="/experts/:id" element={<ExpertProfile />} />
             <Route path="/mandi" element={<MandiPrices />} />
+
+            {/* V4 Innovation Public Features */}
+            <Route path="/crop-advisor" element={<CropRecommendation />} />
+            <Route path="/crop-recommendation" element={<CropRecommendation />} />
+            <Route path="/fertilizer-calc" element={<FertilizerCalculator />} />
+            <Route path="/fertilizer-calculator" element={<FertilizerCalculator />} />
+            <Route path="/schemes" element={<GovtSchemes />} />
+            <Route path="/govt-schemes" element={<GovtSchemes />} />
+            <Route path="/freight-calc" element={<FreightEstimator />} />
+            <Route path="/logistics-calc" element={<FreightEstimator />} />
+            <Route path="/passport/:orderId" element={<DigitalPassport />} />
+            <Route path="/passport" element={<DigitalPassport />} />
+            <Route path="/verify/:orderId" element={<DigitalPassport />} />
+            <Route path="/verify" element={<DigitalPassport />} />
 
             {/* Authenticated Global Routes */}
             <Route element={<ProtectedRoute allowedRoles={['Farmer', 'Buyer', 'Admin', 'Expert']} />}>
@@ -121,6 +163,7 @@ function AppContent() {
             {/* Buyer Specific Routes */}
             <Route element={<ProtectedRoute allowedRoles={['Buyer']} />}>
               <Route path="/buyer/dashboard" element={<BuyerDashboard />} />
+              <Route path="/buyer/bulk-demand" element={<BulkDemand />} />
               <Route path="/buyer/orders" element={<MyOrders />} />
               <Route path="/buyer/wishlist" element={<WishlistPage />} />
               <Route path="/cart" element={<CartPage />} />
@@ -139,7 +182,8 @@ function AppContent() {
           </Routes>
         </main>
       </PageTransitionWrapper>
-      <Footer />
+      {!isStandalonePassport && <Footer />}
+      {!isStandalonePassport && <MobileBottomNav />}
     </div>
   );
 }
@@ -148,6 +192,14 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // If user opens a direct passport/verification QR scan on phone, skip splash screen immediately
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname;
+      if (path.startsWith('/passport') || path.startsWith('/verify')) {
+        setIsLoading(false);
+        return;
+      }
+    }
     const hasVisited = sessionStorage.getItem('krushi_visited');
     if (hasVisited) setIsLoading(false);
   }, []);
@@ -162,15 +214,21 @@ function App() {
   }
 
   return (
-    <AuthProvider>
-      <CartProvider>
-        <SocketProvider>
-          <Router>
-            <AppContent />
-          </Router>
-        </SocketProvider>
-      </CartProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <CartProvider>
+            <SocketProvider>
+              <Router>
+                <ErrorBoundary>
+                  <AppContent />
+                </ErrorBoundary>
+              </Router>
+            </SocketProvider>
+          </CartProvider>
+        </AuthProvider>
+      </LanguageProvider>
+    </ThemeProvider>
   );
 }
 

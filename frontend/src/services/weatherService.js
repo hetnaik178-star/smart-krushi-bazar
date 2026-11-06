@@ -1,8 +1,12 @@
 import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { API_URL } from './api';
 
 export const getWeather = async () => {
-  const { data } = await axios.get(`${API_URL}/weather`);
-  return data;
+  try {
+    const { data } = await axios.get(`${API_URL}/weather`);
+    return data;
+  } catch (err) {
+    console.warn('Weather fetch fallback:', err.message);
+    return null;
+  }
 };

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useContext } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { SocketContext } from '../context/SocketContext';
+import { useLanguage } from '../context/LanguageContext';
 import { getConversations, getMessages, sendMessage } from '../services/chatService';
 import Avatar from '../components/Avatar';
 import RoleBadge from '../components/RoleBadge';
@@ -9,6 +10,7 @@ import { FaPaperPlane, FaImage, FaCircle, FaComments, FaSearch, FaLeaf } from 'r
 import toast from 'react-hot-toast';
 
 const Chat = () => {
+  const { t } = useLanguage();
   const { user } = useContext(AuthContext);
   const { socket, connected } = useContext(SocketContext);
   const [searchParams] = useSearchParams();
@@ -165,13 +167,13 @@ const Chat = () => {
           <div className="p-4 border-b border-surface-100 flex items-center justify-between bg-surface-50/70">
             <div>
               <h2 className="font-bold text-sm text-surface-900 font-display flex items-center gap-2">
-                <FaComments className="text-brand-700" /> Messages
+                <FaComments className="text-brand-700" /> {t('nav.messages', 'Messages')}
               </h2>
-              <p className="text-[11px] text-surface-400 mt-0.5 font-medium">Farmer & Agronomist Network</p>
+              <p className="text-[11px] text-surface-400 mt-0.5 font-medium">{t('chat.subtitle', 'Farmer & Agronomist Network')}</p>
             </div>
             <div className="flex items-center gap-1.5 text-[11px] font-bold text-surface-600 bg-white px-2.5 py-1 rounded-full border border-surface-200 shadow-sm">
               <FaCircle className={`text-[8px] ${connected ? 'text-emerald-500 animate-pulse' : 'text-amber-500'}`} />
-              <span>{connected ? 'Live' : 'Connecting'}</span>
+              <span>{connected ? t('chat.online', 'Live') : t('chat.offline', 'Connecting')}</span>
             </div>
           </div>
 
@@ -184,7 +186,7 @@ const Chat = () => {
               </div>
             ) : conversations.length === 0 ? (
               <div className="p-8 text-center text-surface-400 text-xs font-medium">
-                No active conversations yet. Start a discussion from an Agronomist profile or farmer listing!
+                {t('chat.noMessages', 'No active conversations yet. Start a discussion from an Agronomist profile or farmer listing!')}
               </div>
             ) : (
               conversations.map((conv) => {
@@ -206,7 +208,7 @@ const Chat = () => {
                           {new Date(conv.lastMessageTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
-                      <p className="text-xs text-surface-500 truncate font-medium">{conv.lastMessage || 'No messages yet'}</p>
+                      <p className="text-xs text-surface-500 truncate font-medium">{conv.lastMessage || t('chat.noMessages', 'No messages yet')}</p>
                     </div>
                   </button>
                 );
@@ -293,7 +295,7 @@ const Chat = () => {
                       onClick={() => setSelectedImage(null)}
                       className="text-red-500 font-bold hover:text-red-700 text-xs px-2"
                     >
-                      Remove
+                      {t('common.delete', 'Remove')}
                     </button>
                   </div>
                 )}
@@ -317,7 +319,7 @@ const Chat = () => {
 
                   <input
                     type="text"
-                    placeholder="Type an advisory query, crop health question, or response..."
+                    placeholder={t('chat.typeMessage', 'Type an advisory query, crop health question, or response...')}
                     value={inputText}
                     onChange={handleInputChange}
                     className="input-saas flex-1 text-xs"
@@ -336,9 +338,9 @@ const Chat = () => {
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-8 text-surface-400">
               <FaComments className="text-5xl text-emerald-200 mb-3" />
-              <h3 className="card-heading text-base text-surface-700 mb-1 font-display">Select a Conversation</h3>
+              <h3 className="card-heading text-base text-surface-700 mb-1 font-display">{t('chat.selectContact', 'Select a Conversation')}</h3>
               <p className="text-xs max-w-sm font-medium">
-                Choose a contact from the sidebar or reach out directly to an agronomist specialist.
+                {t('chat.selectContact', 'Choose a contact from the sidebar or reach out directly to an agronomist specialist.')}
               </p>
             </div>
           )}

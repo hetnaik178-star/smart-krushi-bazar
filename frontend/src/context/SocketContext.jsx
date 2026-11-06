@@ -3,7 +3,16 @@ import { io } from 'socket.io-client';
 import { AuthContext } from './AuthContext';
 
 export const SocketContext = createContext();
-const SOCKET_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
+
+// Socket.io connects via Vite proxy (/socket.io) — works on both desktop & mobile
+const getSocketUrl = () => {
+  // Use the current page origin so the Vite proxy handles it on any device
+  if (typeof window !== 'undefined' && window.location) {
+    return window.location.origin;
+  }
+  return 'http://localhost:5173';
+};
+const SOCKET_URL = getSocketUrl();
 
 export const SocketProvider = ({ children }) => {
   const { user } = useContext(AuthContext);

@@ -71,7 +71,46 @@ const AdminPayments = () => {
           </select>
         </div>
       </div>
-      <div className="overflow-x-auto scrollbar-saas">
+      {/* Mobile Card View (< md) */}
+      <div className="block md:hidden divide-y divide-surface-100 p-2.5 space-y-2.5">
+        {payments.map(p => (
+          <div key={p._id} className="p-3 bg-white rounded-2xl border border-surface-200/80 shadow-sm space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <div>
+                <h4 className="font-bold text-xs text-surface-900">{p.userId?.name || 'User'}</h4>
+                <p className="text-[10px] text-surface-400">{p.userId?.email}</p>
+              </div>
+              <div className="text-right">
+                <span className="font-black text-brand-900 text-sm">₹{p.amount}</span>
+                <span className="block text-[9px] text-surface-500 font-mono truncate max-w-[120px]">{p.razorpayPaymentId || 'COD'}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between gap-2 pt-1 border-t border-surface-100 text-[10px]">
+              <div className="flex items-center gap-1.5">
+                <span className="capitalize font-semibold text-surface-700 bg-surface-100 px-1.5 py-0.5 rounded text-[9px]">
+                  {p.type}
+                </span>
+                <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold border ${p.paymentMethod === 'COD' ? 'bg-surface-100 text-surface-700 border-surface-200' : 'bg-brand-50 text-brand-700 border-brand-200'}`}>
+                  {p.paymentMethod || 'Razorpay'}
+                </span>
+              </div>
+
+              <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${statusBadge(p.status)}`}>
+                {p.status}
+              </span>
+            </div>
+          </div>
+        ))}
+        {!loading && payments.length === 0 && (
+          <div className="p-8 text-center text-surface-400 text-xs">
+            No payments found matching your filters.
+          </div>
+        )}
+      </div>
+
+      {/* Desktop Table View (>= md) */}
+      <div className="hidden md:block overflow-x-auto scrollbar-saas">
         <table className="w-full text-left text-xs">
           <thead className="bg-surface-50 text-surface-500 uppercase text-[11px] font-bold tracking-wider border-b border-surface-200">
             <tr>

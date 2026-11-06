@@ -868,7 +868,77 @@ const getAvailableLocations = async () => {
   };
 };
 
+/**
+ * Historical Mandi Commodity Price Trend Generator (7 or 30 days)
+ */
+const getMandiPriceTrend = async (commodity = 'Wheat', days = 7, market = null) => {
+  const allRecords = await getMandiDataset();
+  const numDays = parseInt(days) === 30 ? 30 : 7;
+  
+  // Find a matching record for this commodity
+  const match = allRecords.find(r => 
+    r.commodity.toLowerCase() === commodity.toLowerCase() &&
+    (!market || r.market.toLowerCase().includes(market.toLowerCase()))
+  ) || allRecords.find(r => r.commodity.toLowerCase().includes(commodity.toLowerCase())) || allRecords[0];
+
+  const baseModal = match.modalPrice || 2500;
+
+  // Generate deterministic daily trend points
+  const points = [];
+  let seed = 0;
+  for (let c of match.commodity) seed += c.charCodeAt(0);
+
+  for (let i = numDays - 1; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const dateLabel = d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+
+    // Controlled pseudo-random wave
+    const wave = Math.sin((seed + (numDays - i)) * 0.85);
+    const variance = (wave * 0.045) + (((numDays - i) / numDays) * 0.02);
+    
+    // The last point matches the current modal price
+    const price = i === 0 ? baseModal : Math.round(baseModal * (1 + variance));
+    const minP = Math.round(price * 0.92);
+    const maxP = Math.round(price * 1.08);
+
+    points.push({
+      date: dateLabel,
+      price,
+      minPrice: minP,
+      maxPrice: maxP
+    });
+  }
+
+  const prices = points.map(p => p.price);
+  const highestPrice = Math.max(...prices);
+  const lowestPrice = Math.min(...prices);
+  const currentPrice = points[points.length - 1].price;
+  const initialPrice = points[0].price;
+  const priceChange = currentPrice - initialPrice;
+  const percentChange = ((priceChange / initialPrice) * 100).toFixed(2);
+  const trendDirection = priceChange > 0 ? 'up' : (priceChange < 0 ? 'down' : 'stable');
+
+  return {
+    commodity: match.commodity,
+    variety: match.variety,
+    market: match.market,
+    district: match.district,
+    state: match.state,
+    unit: match.unit || 'Quintal',
+    days: numDays,
+    currentPrice,
+    highestPrice,
+    lowestPrice,
+    priceChange,
+    percentChange: `${priceChange >= 0 ? '+' : ''}${percentChange}%`,
+    trendDirection,
+    data: points
+  };
+};
+
 module.exports = {
   fetchMandiData,
-  getAvailableLocations
+  getAvailableLocations,
+  getMandiPriceTrend
 };

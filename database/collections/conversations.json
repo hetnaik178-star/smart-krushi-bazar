@@ -1,0 +1,268 @@
+[
+  {
+    "_id": "6a8c5268a690997c04124585",
+    "participants": [
+      "6a8c5267a690997c04124574",
+      "6a8c5267a690997c04124571"
+    ],
+    "messages": [
+      {
+        "senderId": "6a8c5267a690997c04124574",
+        "text": "Namaste Doctor, should I spray early in the morning?",
+        "imageUrl": null,
+        "isRead": false,
+        "_id": "6a8c5268a690997c04124586",
+        "createdAt": "2026-08-24T14:17:12.121Z",
+        "updatedAt": "2026-08-24T14:17:12.121Z"
+      }
+    ],
+    "lastMessage": "Namaste Doctor, should I spray early in the morning?",
+    "lastMessageTime": "2026-08-24T14:17:12.124Z",
+    "createdAt": "2026-08-24T14:17:12.126Z",
+    "updatedAt": "2026-08-24T14:17:12.126Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a8c5279a690997c041245b6",
+    "participants": [
+      "6a8c5279a690997c041245a5",
+      "6a8c5279a690997c041245a2"
+    ],
+    "messages": [
+      {
+        "senderId": "6a8c5279a690997c041245a5",
+        "text": "Namaste Doctor, should I spray early in the morning?",
+        "imageUrl": null,
+        "isRead": false,
+        "_id": "6a8c5279a690997c041245b7",
+        "createdAt": "2026-08-24T14:17:29.733Z",
+        "updatedAt": "2026-08-24T14:17:29.733Z"
+      }
+    ],
+    "lastMessage": "Namaste Doctor, should I spray early in the morning?",
+    "lastMessageTime": "2026-08-24T14:17:29.733Z",
+    "createdAt": "2026-08-24T14:17:29.734Z",
+    "updatedAt": "2026-08-24T14:17:29.734Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a8e3b2caffadd3753325ad1",
+    "participants": [
+      "6a8e3b2baffadd3753325abc",
+      "6a8e3b2baffadd3753325ab9"
+    ],
+    "messages": [
+      {
+        "senderId": "6a8e3b2baffadd3753325abc",
+        "text": "Hello Dr. Vikas, I have attached photos of the mango leaves for our upcoming session.",
+        "imageUrl": null,
+        "isRead": false,
+        "_id": "6a8e3b2caffadd3753325ad2",
+        "createdAt": "2026-08-26T01:02:36.094Z",
+        "updatedAt": "2026-08-26T01:02:36.094Z"
+      }
+    ],
+    "lastMessage": "Hello Dr. Vikas, I have attached photos of the mango leaves for our upcoming session.",
+    "lastMessageTime": "2026-08-26T01:02:36.097Z",
+    "createdAt": "2026-08-26T01:02:36.102Z",
+    "updatedAt": "2026-08-26T01:02:36.102Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a8e3d3daffadd3753325bda",
+    "participants": [
+      "6a8e3c43affadd3753325adf",
+      "6a8aecb127e4efe23f961e85"
+    ],
+    "messages": [
+      {
+        "senderId": "6a8e3c43affadd3753325adf",
+        "text": "hii",
+        "imageUrl": null,
+        "isRead": false,
+        "_id": "6a8e3d3daffadd3753325bdb",
+        "createdAt": "2026-08-26T01:11:25.705Z",
+        "updatedAt": "2026-08-26T01:11:25.705Z"
+      },
+      {
+        "senderId": "6a8aecb127e4efe23f961e85",
+        "text": "mana  aa mata su karvu joeaa",
+        "imageUrl": null,
+        "isRead": false,
+        "_id": "6a8e3dbaaffadd3753325c4b",
+        "createdAt": "2026-08-26T01:13:30.402Z",
+        "updatedAt": "2026-08-26T01:13:30.402Z"
+      },
+      {
+        "senderId": "6a8e3c43affadd3753325adf",
+        "text": "NPK & 12:32:16 use",
+        "imageUrl": null,
+        "isRead": false,
+        "_id": "6a8e4f6963c63fa638b40b41",
+        "createdAt": "2026-08-26T02:28:57.030Z",
+        "updatedAt": "2026-08-26T02:28:57.030Z"
+      },
+      {
+        "senderId": "6a8e3c43affadd3753325adf",
+        "text": "10:10:20 use in 15day 1 tim",
+        "imageUrl": null,
+        "isRead": false,
+        "_id": "6a8ee58ef7c5c4bd9e08b75b",
+        "createdAt": "2026-08-26T13:09:34.019Z",
+        "updatedAt": "2026-08-26T13:09:34.019Z"
+      }
+    ],
+    "lastMessage": "10:10:20 use in 15day 1 tim",
+    "lastMessageTime": "2026-08-26T13:09:34.020Z",
+    "createdAt": "2026-08-26T01:11:25.707Z",
+    "updatedAt": "2026-08-26T13:09:34.021Z",
+    "__v": 3
+  },
+  {
+    "_id": "6a8e82fea168cb524eb2f1b1",
+    "participants": [
+      "6a8e82fea168cb524eb2f1a0",
+      "6a8e82fea168cb524eb2f1a3"
+    ],
+    "messages": [
+      {
+        "senderId": "6a8e82fea168cb524eb2f1a0",
+        "text": "Hello Doctor, crop leaves are curling",
+        "imageUrl": null,
+        "isRead": false,
+        "_id": "6a8e82fea168cb524eb2f1b2",
+        "createdAt": "2026-08-26T06:09:02.882Z",
+        "updatedAt": "2026-08-26T06:09:02.882Z"
+      }
+    ],
+    "lastMessage": "Hello Doctor, crop leaves are curling",
+    "lastMessageTime": "2026-08-26T06:09:02.884Z",
+    "createdAt": "2026-08-26T06:09:02.887Z",
+    "updatedAt": "2026-08-26T06:09:02.887Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a8e831b0b7dd3ba80c22548",
+    "participants": [
+      "6a8e831b0b7dd3ba80c22541",
+      "6a8e831b0b7dd3ba80c22544"
+    ],
+    "messages": [
+      {
+        "senderId": "6a8e831b0b7dd3ba80c22541",
+        "text": "Urgent: Wheat rust symptoms appearing",
+        "imageUrl": null,
+        "isRead": false,
+        "_id": "6a8e831b0b7dd3ba80c22549",
+        "createdAt": "2026-08-26T06:09:31.522Z",
+        "updatedAt": "2026-08-26T06:09:31.522Z"
+      }
+    ],
+    "lastMessage": "Urgent: Wheat rust symptoms appearing",
+    "lastMessageTime": "2026-08-26T06:09:31.525Z",
+    "createdAt": "2026-08-26T06:09:31.528Z",
+    "updatedAt": "2026-08-26T06:09:31.528Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a8e83cf8d3f17c78cd395f5",
+    "participants": [
+      "6a8e83ce8d3f17c78cd395a1",
+      "6a8e83cf8d3f17c78cd395dd"
+    ],
+    "messages": [
+      {
+        "senderId": "6a8e83ce8d3f17c78cd395a1",
+        "text": "Dr. Desai, I have attached pictures of the cotton aphids",
+        "imageUrl": null,
+        "isRead": false,
+        "_id": "6a8e83cf8d3f17c78cd395f6",
+        "createdAt": "2026-08-26T06:12:31.531Z",
+        "updatedAt": "2026-08-26T06:12:31.531Z"
+      }
+    ],
+    "lastMessage": "Dr. Desai, I have attached pictures of the cotton aphids",
+    "lastMessageTime": "2026-08-26T06:12:31.532Z",
+    "createdAt": "2026-08-26T06:12:31.534Z",
+    "updatedAt": "2026-08-26T06:12:31.534Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a8e869e80a21b49d3618cdc",
+    "participants": [
+      "6a8e869d80a21b49d3618c73",
+      "6a8e869e80a21b49d3618c79"
+    ],
+    "messages": [
+      {
+        "senderId": "6a8e869d80a21b49d3618c73",
+        "text": "Doctor, I have uploaded photos of the cabbage root problem",
+        "imageUrl": null,
+        "isRead": false,
+        "_id": "6a8e869e80a21b49d3618cdd",
+        "createdAt": "2026-08-26T06:24:30.868Z",
+        "updatedAt": "2026-08-26T06:24:30.868Z"
+      }
+    ],
+    "lastMessage": "Doctor, I have uploaded photos of the cabbage root problem",
+    "lastMessageTime": "2026-08-26T06:24:30.869Z",
+    "createdAt": "2026-08-26T06:24:30.870Z",
+    "updatedAt": "2026-08-26T06:24:30.870Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a8ee4a2f7c5c4bd9e08b654",
+    "participants": [
+      "6a8aecb127e4efe23f961e85",
+      "6a8c5279a690997c041245a2"
+    ],
+    "messages": [
+      {
+        "senderId": "6a8aecb127e4efe23f961e85",
+        "text": "hii",
+        "imageUrl": null,
+        "isRead": false,
+        "_id": "6a8ee4a2f7c5c4bd9e08b655",
+        "createdAt": "2026-08-26T13:05:38.847Z",
+        "updatedAt": "2026-08-26T13:05:38.847Z"
+      }
+    ],
+    "lastMessage": "hii",
+    "lastMessageTime": "2026-08-26T13:05:38.849Z",
+    "createdAt": "2026-08-26T13:05:38.852Z",
+    "updatedAt": "2026-08-26T13:05:38.852Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a8ee723afecf04a41c90388",
+    "participants": [
+      "6a8aecb127e4efe23f961e85",
+      "6a8c5267a690997c04124571"
+    ],
+    "messages": [
+      {
+        "senderId": "6a8aecb127e4efe23f961e85",
+        "text": "hii",
+        "imageUrl": null,
+        "isRead": false,
+        "_id": "6a8ee723afecf04a41c90389",
+        "createdAt": "2026-08-26T13:16:19.750Z",
+        "updatedAt": "2026-08-26T13:16:19.750Z"
+      },
+      {
+        "senderId": "6a8aecb127e4efe23f961e85",
+        "text": "",
+        "imageUrl": "http://localhost:5000/uploads/1787750192478-923057266.avif",
+        "isRead": false,
+        "_id": "6a8ee730afecf04a41c903ab",
+        "createdAt": "2026-08-26T13:16:32.485Z",
+        "updatedAt": "2026-08-26T13:16:32.485Z"
+      }
+    ],
+    "lastMessage": "📷 Photo",
+    "lastMessageTime": "2026-08-26T13:16:32.485Z",
+    "createdAt": "2026-08-26T13:16:19.754Z",
+    "updatedAt": "2026-08-26T13:16:32.488Z",
+    "__v": 1
+  }
+]

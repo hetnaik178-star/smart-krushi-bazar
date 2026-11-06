@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getAllDisputes, resolveDispute } from '../../services/disputeService';
 import BackButton from '../../components/BackButton';
-import { FaBalanceScale, FaCheck, FaTimes, FaSearch, FaCommentDots, FaShieldAlt } from 'react-icons/fa';
+import { FaBalanceScale, FaCheck, FaTimes, FaSearch, FaCommentDots, FaShieldAlt, FaExclamationCircle } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
 const AdminDisputes = () => {
@@ -35,7 +35,13 @@ const AdminDisputes = () => {
     try {
       setSubmitting(true);
       await resolveDispute(selectedDispute._id, { status, adminNotes });
-      toast.success('Dispute resolution verdict updated! ⚖️');
+      toast.success(
+        <div className="flex items-center gap-2">
+          <FaBalanceScale className="text-emerald-500 text-lg animate-bounce-gentle" />
+          <span>Dispute resolution verdict updated! ⚖️</span>
+        </div>,
+        { duration: 4000 }
+      );
       setSelectedDispute(null);
       setAdminNotes('');
       fetchDisputes();
@@ -49,13 +55,13 @@ const AdminDisputes = () => {
   const getStatusBadge = (s) => {
     switch (s) {
       case 'Resolved':
-        return 'bg-emerald-50 text-emerald-800 border-emerald-200';
+        return { classes: 'bg-emerald-50 text-emerald-800 border-emerald-200', icon: <FaCheck className="text-[10px]" /> };
       case 'Rejected':
-        return 'bg-red-50 text-red-800 border-red-200';
+        return { classes: 'bg-red-50 text-red-800 border-red-200', icon: <FaTimes className="text-[10px]" /> };
       case 'Under Review':
-        return 'bg-blue-50 text-blue-800 border-blue-200';
+        return { classes: 'bg-blue-50 text-blue-800 border-blue-200', icon: <FaSearch className="text-[10px]" /> };
       default:
-        return 'bg-amber-50 text-amber-800 border-amber-200';
+        return { classes: 'bg-amber-50 text-amber-800 border-amber-200', icon: <FaExclamationCircle className="text-[10px] animate-pulse-slow" /> };
     }
   };
 
@@ -82,7 +88,7 @@ const AdminDisputes = () => {
           ))}
         </div>
       ) : disputes.length === 0 ? (
-        <div className="card-saas text-center py-16 p-8 shadow-premium">
+        <div className="card-saas text-center py-16 p-8 shadow-premium animate-fade-in">
           <FaBalanceScale className="text-5xl text-emerald-300 mx-auto mb-3" />
           <h2 className="text-xl font-bold text-surface-900 font-display mb-1">No Active Platform Disputes</h2>
           <p className="text-xs text-surface-500 font-medium">All customer trade orders are currently settled with zero pending disputes.</p>
@@ -91,8 +97,9 @@ const AdminDisputes = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Dispute Items List */}
           <div className="lg:col-span-2 space-y-4">
-            {disputes.map((d) => {
+            {disputes.map((d, idx) => {
               const isSelected = selectedDispute?._id === d._id;
+              const badge = getStatusBadge(d.status);
               return (
                 <div
                   key={d._id}
@@ -101,8 +108,8 @@ const AdminDisputes = () => {
                     setStatus(d.status === 'Open' ? 'Resolved' : d.status);
                     setAdminNotes(d.adminNotes || '');
                   }}
-                  className={`card-saas p-6 cursor-pointer transition-all ${
-                    isSelected ? 'border-brand-600 ring-2 ring-emerald-200 shadow-md' : 'hover:border-emerald-300'
+                  className={`card-saas p-6 cursor-pointer transition-all animate-slide-up stagger-${(idx % 8) + 1} ${
+                    isSelected ? 'border-brand-600 ring-2 ring-emerald-200 shadow-md animate-scale-in' : 'hover:border-emerald-300'
                   }`}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-surface-100 mb-3">
@@ -114,8 +121,8 @@ const AdminDisputes = () => {
                         • {new Date(d.createdAt).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}
                       </span>
                     </div>
-                    <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold border uppercase tracking-wider ${getStatusBadge(d.status)}`}>
-                      {d.status}
+                    <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold border uppercase tracking-wider flex items-center gap-1 ${badge.classes}`}>
+                      {badge.icon} {d.status}
                     </span>
                   </div>
 
@@ -141,13 +148,13 @@ const AdminDisputes = () => {
           </div>
 
           {/* Action / Resolution Form Panel */}
-          <div className="card-saas p-6 self-start shadow-premium">
+          <div className="card-saas p-6 self-start shadow-premium animate-slide-left">
             <h2 className="font-bold text-surface-900 text-xs uppercase tracking-wider font-display mb-4 flex items-center gap-2">
               <FaBalanceScale className="text-brand-600" /> Resolution Action Panel
             </h2>
 
             {selectedDispute ? (
-              <form onSubmit={handleResolveSubmit} className="space-y-4">
+              <form onSubmit={handleResolveSubmit} className="space-y-4 animate-scale-in">
                 <div className="p-3.5 bg-surface-50 rounded-xl border border-surface-200 text-xs space-y-1">
                   <p className="font-bold text-surface-900">
                     Dispute #{selectedDispute._id.slice(-6).toUpperCase()}
@@ -183,7 +190,7 @@ const AdminDisputes = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full btn-saas-primary text-xs !py-3 shadow-sm font-bold disabled:opacity-50"
+                  className="w-full btn-saas-primary text-xs !py-3 shadow-sm font-bold disabled:opacity-50 hover-glow"
                 >
                   {submitting ? 'Applying Verdict...' : 'Submit Resolution Verdict'}
                 </button>

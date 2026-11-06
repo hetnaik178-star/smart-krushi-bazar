@@ -1,7 +1,7 @@
-# Smart Krushi Bazar - Background Service Launcher
+# Smart Krushi Bazar - High-Reliability Background Service Launcher
 $ErrorActionPreference = "SilentlyContinue"
 
-$projectRoot = "d:\vc.het naik\smart-krushi-bazar"
+$projectRoot = $PSScriptRoot
 $backendDir = "$projectRoot\backend"
 $frontendDir = "$projectRoot\frontend"
 
@@ -9,47 +9,48 @@ $frontendDir = "$projectRoot\frontend"
 $mongoSvc = Get-Service -Name "MongoDB" -ErrorAction SilentlyContinue
 if ($mongoSvc -and $mongoSvc.Status -ne "Running") {
     Start-Service -Name "MongoDB" -ErrorAction SilentlyContinue
+    Start-Sleep -Seconds 1
 }
 
-# 2. Clean up any previous processes on Port 5000 and 5173
+# 2. Clean up any existing stale processes on Port 5000 and 5173
 $port5000 = Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue
 if ($port5000) {
     foreach ($p in $port5000.OwningProcess) {
-        Stop-Process -Id $p -Force -ErrorAction SilentlyContinue
+        if ($p -and $p -gt 0) { Stop-Process -Id $p -Force -ErrorAction SilentlyContinue }
     }
 }
 
 $port5173 = Get-NetTCPConnection -LocalPort 5173 -ErrorAction SilentlyContinue
 if ($port5173) {
     foreach ($p in $port5173.OwningProcess) {
-        Stop-Process -Id $p -Force -ErrorAction SilentlyContinue
+        if ($p -and $p -gt 0) { Stop-Process -Id $p -Force -ErrorAction SilentlyContinue }
     }
 }
 
-Start-Sleep -Milliseconds 500
+Start-Sleep -Milliseconds 600
 
-# 3. Start Backend in completely hidden background process using node src/server.js
-Start-Process -FilePath "cmd.exe" -ArgumentList "/c cd /d ""$backendDir"" && node src/server.js" -WindowStyle Hidden
+# 3. Launch Backend with node.exe directly in working directory
+Start-Process -FilePath "node.exe" -ArgumentList "src/server.js" -WorkingDirectory "$backendDir" -WindowStyle Hidden
 
-Start-Sleep -Seconds 2
+# 4. Launch Frontend Vite Dev Server with cmd.exe in working directory
+Start-Process -FilePath "cmd.exe" -ArgumentList "/c npm run dev -- --port 5173" -WorkingDirectory "$frontendDir" -WindowStyle Hidden
 
-# 4. Start Frontend in completely hidden background process
-Start-Process -FilePath "cmd.exe" -ArgumentList "/c cd /d ""$frontendDir"" && npm run dev -- --host 127.0.0.1 --port 5173" -WindowStyle Hidden
-
-# 5. Wait for Frontend & Backend to become ready (max 10 seconds)
+# 5. Wait for both servers to be actively listening (max 15 seconds)
 $ready = $false
-for ($i = 0; $i -lt 20; $i++) {
+for ($i = 0; $i -lt 30; $i++) {
+    Start-Sleep -Milliseconds 500
     try {
-        $resF = Invoke-WebRequest -Uri "http://127.0.0.1:5173" -UseBasicParsing -TimeoutSec 1
-        $resB = Invoke-RestMethod -Uri "http://localhost:5000" -Method Get -TimeoutSec 1
-        if ($resF.StatusCode -eq 200 -and $resB) {
+        $conn5000 = Get-NetTCPConnection -LocalPort 5000 -State Listen -ErrorAction SilentlyContinue
+        $conn5173 = Get-NetTCPConnection -LocalPort 5173 -State Listen -ErrorAction SilentlyContinue
+        if ($conn5000 -and $conn5173) {
             $ready = $true
             break
         }
-    } catch {
-        Start-Sleep -Milliseconds 500
-    }
+    } catch {}
 }
+
+# Extra safety pause so Vite HMR / index bundle is fully primed
+Start-Sleep -Milliseconds 600
 
 # 6. Open in Google Chrome if installed, otherwise default browser
 $chromePaths = @(
@@ -66,8 +67,9 @@ foreach ($cp in $chromePaths) {
     }
 }
 
+$targetUrl = "http://localhost:5173"
 if ($chromeExe) {
-    Start-Process $chromeExe -ArgumentList "http://localhost:5173"
+    Start-Process $chromeExe -ArgumentList $targetUrl
 } else {
-    Start-Process "http://localhost:5173"
+    Start-Process $targetUrl
 }

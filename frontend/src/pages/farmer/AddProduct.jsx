@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createProduct } from '../../services/api';
+import { useLanguage } from '../../context/LanguageContext';
 import BackButton from '../../components/BackButton';
 import { FaSeedling, FaUpload, FaLeaf } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
 const AddProduct = () => {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -84,7 +86,7 @@ const AddProduct = () => {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 page-fade-in">
       <div className="mb-6">
-        <BackButton fallback="/farmer/dashboard" label="Back to Dashboard" />
+        <BackButton fallback="/farmer/dashboard" label={t('nav.dashboard', 'Back to Dashboard')} />
       </div>
 
       <div className="card-saas p-8 shadow-premium">
@@ -93,8 +95,8 @@ const AddProduct = () => {
             <FaSeedling />
           </div>
           <div>
-            <h1 className="page-heading text-2xl font-display">List Fresh Harvest</h1>
-            <p className="text-xs text-surface-500 font-medium">Publish produce directly to buyers with zero broker cuts</p>
+            <h1 className="page-heading text-2xl font-display">{t('farmer.addProductTitle', 'List Fresh Harvest')}</h1>
+            <p className="text-xs text-surface-500 font-medium">{t('farmer.addProductSubtitle', 'Publish produce directly to buyers with zero broker cuts')}</p>
           </div>
         </div>
 
@@ -106,10 +108,10 @@ const AddProduct = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1.5 font-display">Crop Title / Produce Name</label>
+            <label className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1.5 font-display">{t('farmer.cropNameLabel', 'Crop Title / Produce Name')}</label>
             <input
               name="name"
-              placeholder="e.g. Organic Kesar Mango, Desi Wheat"
+              placeholder={t('farmer.cropNamePlaceholder', 'e.g. Organic Kesar Mango, Desi Wheat')}
               value={formData.name}
               onChange={handleChange}
               required
@@ -118,10 +120,10 @@ const AddProduct = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1.5 font-display">Crop Description</label>
+            <label className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1.5 font-display">{t('farmer.descriptionLabel', 'Crop Description')}</label>
             <textarea
               name="description"
-              placeholder="Freshly harvested, organic farm produce..."
+              placeholder={t('farmer.descriptionPlaceholder', 'Freshly harvested, organic farm produce...')}
               value={formData.description}
               onChange={handleChange}
               rows="3"
@@ -132,26 +134,26 @@ const AddProduct = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1.5 font-display">Category</label>
+              <label className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1.5 font-display">{t('farmer.categoryLabel', 'Category')}</label>
               <select
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
                 className="input-saas text-xs font-bold text-brand-900 bg-emerald-50/50 border-emerald-200"
               >
-                <option value="Vegetables">🥦 Vegetables</option>
-                <option value="Fruits">🍎 Fruits</option>
-                <option value="Grains">🌾 Grains</option>
-                <option value="Pulses">🫘 Pulses</option>
-                <option value="Other">📦 Other</option>
+                <option value="Vegetables">🥦 {t('marketplace.vegetables', 'Vegetables')}</option>
+                <option value="Fruits">🍎 {t('marketplace.fruits', 'Fruits')}</option>
+                <option value="Grains">🌾 {t('marketplace.grains', 'Grains')}</option>
+                <option value="Pulses">🫘 {t('marketplace.pulses', 'Pulses')}</option>
+                <option value="Other">📦 {t('marketplace.other', 'Other')}</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1.5 font-display">Farm Location</label>
+              <label className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1.5 font-display">{t('productDetails.farmLocation', 'Farm Location')}</label>
               <input
                 name="location"
-                placeholder="Navsari, Gujarat"
+                placeholder={t('auth.locationPlaceholder', 'Navsari, Gujarat')}
                 value={formData.location}
                 onChange={handleChange}
                 required
@@ -162,7 +164,7 @@ const AddProduct = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1.5 font-display">Price per Unit (₹)</label>
+              <label className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1.5 font-display">{t('farmer.priceLabel', 'Price per Unit (₹)')}</label>
               <input
                 name="price"
                 type="number"
@@ -175,7 +177,7 @@ const AddProduct = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1.5 font-display">Quantity in Stock</label>
+              <label className="block text-xs font-bold text-surface-700 uppercase tracking-wider mb-1.5 font-display">{t('farmer.quantityLabel', 'Quantity in Stock')}</label>
               <input
                 name="quantity"
                 type="number"
@@ -191,7 +193,7 @@ const AddProduct = () => {
           {/* Image Upload & Live Thumbnail */}
           <div className="p-4 bg-surface-50 rounded-2xl border border-surface-200 space-y-2">
             <label className="block text-xs font-bold text-surface-700 uppercase tracking-wider flex items-center gap-1.5 font-display">
-              <FaUpload className="text-brand-700" /> Upload Produce Photo
+              <FaUpload className="text-brand-700" /> {t('farmer.imageUploadLabel', 'Upload Produce Photo')}
             </label>
             <input
               type="file"
@@ -214,7 +216,7 @@ const AddProduct = () => {
             disabled={loading}
             className="w-full btn-saas-primary text-xs !py-3.5 mt-4 shadow-sm disabled:opacity-50 font-bold"
           >
-            {loading ? 'Publishing Crop Listing...' : 'Publish to Marketplace'}
+            {loading ? t('farmer.savingCrop', 'Publishing Crop Listing...') : t('farmer.publishProduceBtn', 'Publish to Marketplace')}
           </button>
         </form>
       </div>
