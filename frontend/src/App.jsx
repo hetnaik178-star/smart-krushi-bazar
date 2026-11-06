@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { LanguageProvider } from './context/LanguageContext';
@@ -204,10 +204,10 @@ function App() {
     if (hasVisited) setIsLoading(false);
   }, []);
 
-  const handleSplashFinish = () => {
-    sessionStorage.setItem('krushi_visited', 'true');
+  const handleSplashFinish = useCallback(() => {
+    try { sessionStorage.setItem('krushi_visited', 'true'); } catch (e) {}
     setIsLoading(false);
-  };
+  }, []);
 
   if (isLoading) {
     return <SplashScreen onFinish={handleSplashFinish} />;

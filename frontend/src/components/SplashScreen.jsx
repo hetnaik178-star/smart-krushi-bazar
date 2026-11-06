@@ -4,8 +4,8 @@ const SplashScreen = ({ onFinish }) => {
   const [exit, setExit] = useState(false);
 
   useEffect(() => {
-    const timer1 = setTimeout(() => setExit(true), 4100); // Start exit transition
-    const timer2 = setTimeout(() => onFinish(), 4700);    // Unmount
+    const timer1 = setTimeout(() => setExit(true), 2200); // Start exit transition
+    const timer2 = setTimeout(() => onFinish(), 2700);    // Unmount
     return () => { clearTimeout(timer1); clearTimeout(timer2); };
   }, [onFinish]);
 
